@@ -22,7 +22,7 @@ define([
           view: view,
           graphic: null
         })
-        this.fireFields = ['NgayCapNhat', 'NguoiCapNhat', 'MaPhuongXa', 'MaHuyenTP', 'MaDoiTuong'];
+        this.fireFields = ['NguoiNhap', 'ThoiGianNhap'];
         this.inputElement = {};
       }
       get selectFeature() {
@@ -103,9 +103,11 @@ define([
       /**
        * Hiển thị popup
        */
-      showEdit() {
-        let subtype = this.getSubtype();
-        this.resetInputElement();
+      showEdit(target, featureLayer) {
+        const graphic = target.graphic,
+          layer = featureLayer,
+          attributes = graphic.attributes;
+        if (!graphic.layer) graphic.layer = layer;
         let div = domConstruct.create('div', {
           id: 'show-edit-container',
           class: 'popup-content'
@@ -115,7 +117,6 @@ define([
         for (let field of this.layer.fields) {
 
           if (field.type === 'oid' || this.isFireField(field.name)
-            // || (this.layer.id == constName.TRONGTROT && (field.name == "NhomCayTrong" || field.name == "LoaiCayTrong"))
           )
             continue;
           //tạo <tr>
@@ -126,129 +127,24 @@ define([
           }),
             input,
             tdValue = domConstruct.create('td');
-
-          if (subtype && subtype.domains[field.name]) {
-            input = this.renderDomain(subtype.domains[field.name], field.name);
-          }
-          //kiểm tra domain
-          else if (field.domain) {
-            input = this.renderDomain(field.domain, field.name);
-          } else {
-            let inputType, value;
-            if (field.type === "small-integer" ||
-              (field.type === "integer") ||
-              (field.type === "double"))
-              inputType = 'number';
-            else if (field.type === 'date') {
-              inputType = 'date';
-              var d = new Date(this.attributes[field.name]),
-                date = d.getDate(),
-                month = d.getMonth() + 1,
-                year = d.getFullYear();
-              if (date / 10 < 1)
-                date = '0' + date;
-              if (month / 10 < 1)
-                month = '0' + month;
-              value = `${year}-${month}-${date}`;
-            } else {
-              inputType = 'text';
-            }
-            //neu du lieu qua lon thi hien thi textarea
-            if (length >= this.options.hightLength) {
-              input = domConstruct.create('textarea', {
-                rows: 5,
-                cols: 25,
-                class: "form-control",
-                innerHTML: value || this.attributes[field.name],
-                value: value || this.attributes[field.name]
-              });
-            } else {
-              input = domConstruct.create('input', {
-                type: inputType,
-                value: value || this.attributes[field.name],
-                class: "form-control"
-              });
-
-            }
-          }
-          input.name = field.name;
+          let inputType;
+          //neu du lieu qua lon thi hien thi textarea
+          input = domConstruct.create('input', {
+            type: "text",
+            class: "form-control",
+            name: field.name,
+            id: field.name
+          });
+          if (this.attributes[field.name])
+            input.setAttribute('value', this.attributes[field.name]);
           domConstruct.place(input, tdValue);
           domConstruct.place(tdName, row);
           domConstruct.place(tdValue, row);
           domConstruct.place(row, table);
 
-          this.inputElement[field.name] = input;
-          //thêm vào html
-          this.registerChangeEvent(input);
         }
 
-        // }
-        if (this.layer.hasAttachments) {
-
-
-          this.layer.getAttachments(this.objectId).then(res => {
-            let div = domConstruct.create('div', {
-              class: 'attachment-header',
-              id: `attachment-${this.layer.id}-${this.attributes['OBJECTID']}`
-            }, document.getElementById('show-edit-container'));
-            div.innerText = "Hình ảnh";
-            let form = document.createElement('form');
-            form.id = 'attachment-data';
-            form.enctype = 'multipart/form-data';
-            form.method = 'post';
-            let file = document.createElement('input');
-            file.type = 'file';
-            file.name = 'attachment';
-            form.appendChild(file);
-            let hideField = document.createElement('input');
-            hideField.hidden = 'hidden';
-            hideField.name = 'f';
-            hideField.value = 'json';
-            form.appendChild(hideField);
-            div.appendChild(form);
-            this.registerChangeEvent(file);
-
-            if (res && res.attachmentInfos && res.attachmentInfos.length > 0) {
-              for (let item of res.attachmentInfos) {
-                this.renderAttachmentEditPopup(item, {
-                  container: div,
-                })
-              }
-            }
-          })
-        }
-        for (let key in this.inputElement) {
-          this.inputChangeHandler(this.inputElement[key]);
-        }
-        this.view.popup.content = div;
-        this.view.popup.title = this.layer.title;
-        //CHANGE ICON FROM UPDATE TO EDIT
-        let updateAction = this.view.popup.actions.find(function (action) {
-          return action.id === 'update';
-        })
-        updateAction.className = 'esri-icon-check-mark';
-        //ADD ACTON UPDATE GEOMETRY WITH GPS
-        this.view.popup.actions.add({
-          id: 'update-geometry',
-          title: 'Cập nhật vị trí đối tượng',
-          className: 'esri-icon-locate'
-        })
-        let viewDetailAction = this.view.popup.actions.find(function (action) { return action.id === 'view-detail'; })
-        if (this.layer.id === constName.TRONGTROT && viewDetailAction) {
-          viewDetailAction.id = 'view-detail-edit';
-        }
-        //RESTORE WHEN OUT EDIT MODE
-        var watchFunc = () => {
-          //REVERT ICON UPDATE ACTION
-          updateAction.className = 'esri-icon-edit';
-          //DELETE ACTION UPDATE GEMERTRY WITH GPS
-          let action = this.view.popup.actions.find(f => { return f.id === 'update-geometry' });
-          if (action) this.view.popup.actions.remove(action);
-          //REVERT ID VIEW DETAIL
-          if (this.layer.id === constName.TRONGTROT && viewDetailAction) viewDetailAction.id = 'view-detail';
-        }
-        watchUtils.once(this.view.popup, 'selectedFeature').then(watchFunc)
-        watchUtils.once(this.view.popup, 'visible').then(watchFunc)
+        return div.outerHTML;
       }
       renderAttachmentEditPopup(item, props) {
         const
@@ -366,38 +262,6 @@ define([
         }
       }
       /**
-       * ATTACHMENT
-       */
-      uploadFile() {
-        let url = this.layer.url + "/" + this.layer.layerId + "/" + this.objectId + "/addAttachment";
-        let attachmentForm = document.getElementById('attachment-data');
-        if (attachmentForm) {
-          esriRequest(url, {
-            responseType: 'json',
-            body: attachmentForm
-          }).then(res => {
-            if (res.data && res.data.addAttachmentResult && res.data.addAttachmentResult.success) {
-              $.notify('Thêm hình ảnh thành công', {
-                type: 'success',
-                placement: {
-                  from: 'top',
-                  align: 'left'
-                }
-              });
-            } else {
-              $.notify('Thêm hình ảnh không thành công', {
-                type: 'danger',
-                placement: {
-                  from: 'top',
-                  align: 'left'
-                }
-              });
-            }
-          })
-        }
-      }
-
-      /**
        * * * * * * * * * * XÓA - SỬA * * * * * * * * * *
        */
 
@@ -418,41 +282,8 @@ define([
           })
         try {
           if (this.attributes) {
-            if (this.attributes['attachment']) {
-              this.uploadFile();
-            }
-            if (this.attributes.deleteAttachment) {
-              for (let url of this.attributes.deleteAttachment) {
-                esriRequest(url);
-              }
-              this.attributes.deleteAttachment = [];
-            }
-            for (let field of this.layer.fields) {
-              const type = field.type,
-                name = field.name;
-              if (type === 'date') {
-                let date = this.attributes[name]
-                //nếu như date có giá trị và date không phải là số
-                if (date && !Number.isInteger(date)) {
-                  let
-                    splitDate = date.split('-');
-                  if (splitDate.length == 3) {
-                    let day = splitDate[2],
-                      month = splitDate[1],
-                      year = splitDate[0];
-                    var dayString = new Date(`${month}/${day}/${year}`);
-                    const timestamp = dayString.getTime();
-                    this.attributes[name] = timestamp;
-                  } else {
-                    throw 'Không thể lấy dữ liệu thời gian'
-                  }
-                }
-              }
-            }
-            const updatedInfo = editingSupport.getUpdatedInfo(this.view)
-            for (let i in updatedInfo) {
-              this.attributes[i] = updatedInfo[i];
-            }
+            var input = document.getElementById("MaDanhBo");
+            this.attributes.MaDanhBo = input.value;
             this.layer.applyEdits({
               updateFeatures: [{
                 attributes: this.attributes
@@ -473,9 +304,10 @@ define([
                 query.outField = ['*'];
                 query.where = 'OBJECTID=' + this.attributes['OBJECTID'];
                 this.layer.queryFeatures(query).then(res => {
-                  this.view.popup.open({
-                    features: res.features
-                  })
+                  // this.view.popup.open({
+                  //   features: res.features
+                  // })
+                  this.view.popup.close();
                 })
               }
             })

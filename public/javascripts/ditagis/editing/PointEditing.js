@@ -52,6 +52,8 @@ define([
         }).done((res) => {
           var address = res.display_name;
           attributes['GHICHU'] = address;
+          attributes['ThoiGianNhap'] = new Date().getTime();
+          attributes['NguoiNhap'] = USER.name;
           point.attributes = attributes;
           let edits = {
             addFeatures: [point]

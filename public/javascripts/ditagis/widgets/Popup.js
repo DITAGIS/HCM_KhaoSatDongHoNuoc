@@ -49,12 +49,16 @@ define([
         layer.then(() => {
           // let layer = evt.layer;
           if (layer.type == 'feature') {
-            let actions = [];
+            let actions = [{
+                id: 'update-geometry',
+                title: 'Cập nhật vị trí đối tượng',
+                className: 'esri-icon-locate'
+              }];
             if (layer.permission.edit)
               actions.push({
                 id: "update",
                 title: "Cập nhật",
-                className: "esri-icon-edit",
+                className: "esri-icon-check-mark",
                 layer: layer
               });
             if (layer.permission.delete)
@@ -66,7 +70,8 @@ define([
               })
             layer.popupTemplate = {
               content: (target) => {
-                return this.contentPopup(target,layer);
+                // return this.contentPopup(target,layer);
+                return this.popupEdit.showEdit(target,layer);
               },
               title: layer.title,
               actions: actions
@@ -114,11 +119,8 @@ define([
       switch (actionId) {
         case "update":
           if (layer.permission && layer.permission.edit) {
-            if (event.action.className === 'esri-icon-check-mark') {
-              this.popupEdit.editFeature();
-            } else {
-              this.popupEdit.showEdit();
-            }
+            this.popupEdit.editFeature();
+            
           } else {
             fail = true;
           }
@@ -129,26 +131,6 @@ define([
           } else {
             fail = true;
           }
-          break;
-        case "view-detail":
-          if (this.attributes['MaDoiTuong'])
-            this.triggerActionViewDetailTrongtrot(this.attributes['MaDoiTuong']);
-          else
-            $.notify({
-              message: 'Không xác được định danh'
-            }, {
-                type: 'danger'
-              })
-          break;
-        case "view-detail-edit":
-          if (this.attributes['MaDoiTuong'])
-            this.popupEdit.showTableDetailTrongTrot();
-          else
-            $.notify({
-              message: 'Không xác được định danh'
-            }, {
-                type: 'danger'
-              })
           break;
         case "update-geometry":
           if (layer.geometryType === 'polygon') {

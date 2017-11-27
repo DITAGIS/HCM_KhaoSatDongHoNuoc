@@ -1,3 +1,5 @@
+var USER = {name:'user1'};
+
 /**
  * Phần này quan trọng không được xóa
  */
