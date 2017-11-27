@@ -1,0 +1,16 @@
+extends layout
+block stylesheet
+  link(rel='stylesheet', href='stylesheets/redmond/jquery-ui-1.7.1.custom.css')
+  link(rel='stylesheet', href='stylesheets/iThing.css')
+block javascript
+  script(src='javascripts/lib/jquery-ui.min.js')
+  script(src='javascripts/lib/jQAllRangeSliders-min.js')
+  script(src='javascripts/config.js')
+  script(src='https://js.arcgis.com/4.4/')
+  script(src='javascripts/ditagis/main.js')
+block content
+  script.
+    //hiển thị loader
+    Loader.show();
+  #map
+  

@@ -1,0 +1,8 @@
+.dtg-wget-timeslider{
+    padding: 5px;
+    width: 500px;
+    height: 100px;
+}
+.dtg-wget-timeslider .container label {font-weight: normal; float: left; margin-right: .5em; font-size: 1.1em;}
+.dtg-wget-timeslider .container select {margin-right: 1em; float: left;}
+.dtg-wget-timeslider .container .ui-slider {clear: both; top: 5em;}

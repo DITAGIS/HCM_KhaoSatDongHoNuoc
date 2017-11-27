@@ -1,0 +1,36 @@
+.ditagis-widget-user{
+    max-height: 550px;
+    width: 300px;
+    max-height: 420px;
+    overflow: hidden;
+    overflow-y: auto;
+    transition: max-height 250ms ease-in-out;
+}
+.ditagis-widget-user ul {
+    margin: 0;
+    list-style: none;
+    padding: 0;
+}
+.ditagis-widget-user li.title{
+    text-align: center;
+    font-weight: bold;
+    padding: 7px;
+    text-transform: uppercase
+}
+.ditagis-widget-user li.item{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex: 1;
+}
+.ditagis-widget-user .container{
+    width: 100%;
+    text-align: center;
+    display: table-row;
+    justify-content: flex-start;
+    padding: 9px 15px 9px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(50, 50, 50, 0.25);
+    transition: padding 250ms ease-in-out 0ms;
+}
