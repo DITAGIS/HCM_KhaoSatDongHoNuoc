@@ -66,7 +66,16 @@ require([
         url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/',
         title: 'Ảnh vệ tinh',
         id: 'worldimagery',
-        visible: false
+        visible: false,
+        imageFormat:'gif',
+        imageTransparency:false,
+        sublayers:[
+          {id:0,visible:false},
+          {id:1,visible:false},
+          {id:2,visible:false},
+          {id:3,visible:false},
+          {id:4,visible:false}
+        ]
       });
       let osm = new OpenStreetMapLayer({
         title: 'Open Street Map',
