@@ -8,7 +8,7 @@ var session = require('express-session')
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 var index = require('./routes/index');
-var accountManager = require('./modules/AccountDatabase');
+var database = require('./modules/Database');
 var app = express();
 
 // view engine setup
@@ -46,7 +46,7 @@ passport.deserializeUser((user, done) => {
 })
 passport.use(new LocalStrategy(
   function (username, password, done) {
-    accountManager.isUser(username,password)
+    database.isUser(username,password)
       .then(function (user) {
         // bcrypt.compare(password, user.Password, function (err, result) {
           if (!user) {

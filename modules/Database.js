@@ -23,4 +23,17 @@ function isUser(username, password) {
         })
     });
 }
+function danhBo(id){
+    sql.connect(config).then(() => {
+        return sql.query`SELECT MaDanhBo FROM DANHSACHMADANHBO WHERE MaDanhBo = '${id}'`;
+    }).then(result => {
+        if (result.recordset.length > 0)
+            resolve(result.recordset[0])
+        else resolve(null);
+        sql.close();
+    }).catch(err => {
+        console.log(err);
+        sql.close();
+    })
+}
 module.exports.isUser = isUser;
