@@ -70,19 +70,11 @@ define([
         }
         return null;
       }
-      renderDomain(domain, name) {
-        let codedValues;
-        if (domain.type === "inherited") {
-          let fieldDomain = this.layer.getFieldDomain(name);
-          if (fieldDomain) codedValues = fieldDomain.codedValues;
-        } else {//type is codedValue
-          codedValues = domain.codedValues;
-        }
-        if (!codedValues) return null;
-
-        let currentValue = this.attributes[name];
+      renderDomain(codedValues, id) {
+        let currentValue = this.attributes[id];
         let input = document.createElement('select');
         input.classList.add('form-control');
+        input.id = id;
         let defaultComboValue = document.createElement('option');
         defaultComboValue.value = -1;
         defaultComboValue.innerText = 'Chọn giá trị...';
@@ -93,12 +85,19 @@ define([
           let option = document.createElement('option');
           option.setAttribute('value', dmCode);
           if (currentValue === dmCode) {
-            option.selected = 'selected'
+            option.setAttribute("selected",'selected');
           }
           option.innerHTML = dmName;
           input.appendChild(option);
         }
         return input;
+      }
+      getSubtype(name, value) {
+        name = name || this.layer.typeIdField;
+        value = value || this.attributes[name];
+        return this.layer.fields.find(f => {
+          return f.name == name;
+        }).domain.codedValues;
       }
       /**
        * Hiển thị popup
@@ -107,6 +106,8 @@ define([
         const graphic = target.graphic,
           layer = featureLayer,
           attributes = graphic.attributes;
+        let codedValues = this.getSubtype("TinhTrang");
+        console.log(codedValues);
         if (!graphic.layer) graphic.layer = layer;
         let div = domConstruct.create('div', {
           id: 'show-edit-container',
@@ -127,16 +128,21 @@ define([
           }),
             input,
             tdValue = domConstruct.create('td');
-          let inputType;
-          //neu du lieu qua lon thi hien thi textarea
-          input = domConstruct.create('input', {
-            type: "text",
-            class: "form-control",
-            name: field.name,
-            id: field.name
-          });
-          if (this.attributes[field.name])
-            input.setAttribute('value', this.attributes[field.name]);
+          if (codedValues && field.domain) {
+            input = this.renderDomain(codedValues,field.name);
+          }
+          else {
+            let inputType;
+            //neu du lieu qua lon thi hien thi textarea
+            input = domConstruct.create('input', {
+              type: "tel",
+              class: "form-control",
+              name: field.name,
+              id: field.name
+            });
+            if (this.attributes[field.name])
+              input.setAttribute('value', this.attributes[field.name]);
+          }
           domConstruct.place(input, tdValue);
           domConstruct.place(tdName, row);
           domConstruct.place(tdValue, row);
@@ -172,98 +178,6 @@ define([
           container.removeChild(itemDiv);
         });
       }
-      registerChangeEvent(input) {
-        on(input, 'change', () => this.inputChangeHandler(input));
-      }
-      /**
-       * Khi ô nhập dữ liệu trong popup có sự thay đổi giá trị
-       * @param {htmldom} inputDOM 
-       */
-      inputChangeHandler(inputDOM) {
-        const name = inputDOM.name,
-          value = inputDOM.value;
-        if (!value) return;
-        if (value == -1) {
-          this.attributes[name] = null;
-          return;
-        }
-        else if (name === 'attachment') {
-          this.attributes[name] = value;
-        } else {
-          const field = this.layer.fields.find(f => f.name === name);
-          if (field) {
-            let fieldType = field.type;
-            if (fieldType) {
-              let convertValue;
-              if (fieldType === "small-integer" || fieldType === "integer")
-                convertValue = parseInt(value);
-              else if (fieldType === "double") {
-                convertValue = parseFloat(value);
-              }
-              else {
-                convertValue = value;
-              }
-              this.attributes[name] = convertValue;
-            }
-          }
-        }
-        //check subtype
-        let subtypes = this.getSubtype(name);
-        if (subtypes) {
-          for (let key in subtypes.domains) {
-            let subtype = subtypes.domains[key];
-            let input = this.inputElement[key];
-            let codedValues;
-            if (subtype.type === "inherited") {
-              let fieldDomain = this.layer.getFieldDomain(key);
-              if (fieldDomain) codedValues = fieldDomain.codedValues;
-            } else {
-              codedValues = subtype.codedValues;
-            }
-            if (input.tagName === 'SELECT') {
-              input.innerHTML = '';
-              let defaultComboValue = document.createElement('option');
-              defaultComboValue.value = -1;
-              defaultComboValue.innerText = 'Chọn giá trị...';
-              input.appendChild(defaultComboValue);
-              for (let codedValue of codedValues) {
-                let option = document.createElement('option');
-                option.setAttribute('value', codedValue.code);
-                option.innerText = codedValue.name;
-                if (codedValue.code === this.attributes[key])
-                  option.setAttribute('selected', 'selected');
-                input.appendChild(option);
-              }
-              this.attributes[key] = input.value == -1 ? null : input.value;
-            } else {
-              let dom = document.createElement('select');
-              dom.classList.add('form-control');
-              dom.setAttribute('name', key);
-              let defaultComboValue = document.createElement('option');
-              defaultComboValue.value = -1;
-              defaultComboValue.innerText = 'Chọn giá trị...';
-              dom.appendChild(defaultComboValue);
-              this.registerChangeEvent(dom);
-              for (let codedValue of codedValues) {
-                let option = document.createElement('option');
-                option.setAttribute('value', codedValue.code);
-                option.innerText = codedValue.name;
-                dom.appendChild(option);
-              }
-              if (input.parentElement) {
-                let parent = input.parentElement;
-                input.parentElement.removeChild(parent.firstChild);
-                parent.appendChild(dom);
-              }
-              this.attributes[key] = input.value == -1 ? null : input.value;
-              this.inputElement[key] = dom;
-            }
-          }
-        }
-      }
-      /**
-       * * * * * * * * * * XÓA - SỬA * * * * * * * * * *
-       */
 
       /**
        * Sự kiện chỉnh sửa thông tin đối tượng
@@ -282,8 +196,10 @@ define([
           })
         try {
           if (this.attributes) {
-            var input = document.getElementById("MaDanhBo");
-            this.attributes.MaDanhBo = input.value;
+            var inputMaDanhBo = document.getElementById("MaDanhBo");
+            this.attributes.MaDanhBo = inputMaDanhBo.value;
+            var inputTinhTrang = document.getElementById("TinhTrang");
+            this.attributes.TinhTrang = inputTinhTrang.value;
             this.layer.applyEdits({
               updateFeatures: [{
                 attributes: this.attributes
