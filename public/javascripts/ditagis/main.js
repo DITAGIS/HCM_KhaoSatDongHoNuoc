@@ -113,14 +113,11 @@ require([
           });
         });
       }
-      let fl = new FeatureLayer({
-        url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/0',
-        outFields:['*'],
-        permission:{
-          view:true,create:true,delete:true,edit:true
-        }
-      });
-      map.add(fl);
+      let ksDHNLayer = new FeatureLayer(mapconfigs.KSDongHoNuocLayer);
+      map.add(ksDHNLayer);
+      let table = new FeatureLayer(mapconfigs.BangMaDanhBo);
+      map.add(table);
+      console.log(table);
     }
     const initWidgets = () => {
       view.ui.move(["zoom"], "bottom-right");
