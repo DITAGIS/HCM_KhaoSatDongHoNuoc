@@ -5,8 +5,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session')
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
 var index = require('./routes/index');
-
+var accountManager = require('./modules/AccountDatabase');
 var app = express();
 
 // view engine setup
@@ -29,8 +31,48 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
 
+//PASSPORT
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.serializeUser((user, done) => {
+  console.log('serializeUser');
+  done(null, user);
+})
+passport.deserializeUser((user, done) => {
+  console.log('deserializeUser');
+    done(null, user);
+})
+passport.use(new LocalStrategy(
+  function (username, password, done) {
+    accountManager.isUser(username,password)
+      .then(function (user) {
+        // bcrypt.compare(password, user.Password, function (err, result) {
+          if (!user) {
+            return done(null, false, { message: 'Incorrect username and password' });
+          }
+          return done(null, user);
+        // })
+      }).catch(function (err) {
+        return done(err);
+      })
+  }
+))
+app.use('/', index);
+app.post('/session', function (req, res) {
+  if (req.isAuthenticated())
+    res.status(200).send(req.session.passport.user);
+  else
+    res.status(400).send();
+})
+app.get('/login', (req, res) => {
+  res.render('login', { title: 'Đăng nhập' });
+});
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/',
+  failureRedirect: '/login'
+}))
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   var err = new Error('Not Found');

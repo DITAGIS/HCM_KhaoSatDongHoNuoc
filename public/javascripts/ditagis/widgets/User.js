@@ -57,7 +57,7 @@ define([
                     //thông tin tài khoản
                     domConstruct.create('li',{
                         class:'title',
-                        innerHTML:this.user.displayName
+                        innerHTML:this.user.DisplayName
                     },this.DOM.ul);
                     this.DOM.infoLi = domConstruct.create('li',{
                         class:'item'

@@ -1,5 +1,3 @@
-var USER = {name:'user1'};
-
 /**
  * Phần này quan trọng không được xóa
  */
@@ -16,6 +14,7 @@ require([
   "esri/views/MapView",
   "esri/layers/OpenStreetMapLayer",
   "esri/layers/MapImageLayer",
+  "esri/layers/WebTileLayer",
   "esri/layers/FeatureLayer",
   "esri/widgets/Expand",
   "esri/widgets/Locate",
@@ -23,8 +22,10 @@ require([
   "esri/widgets/Search",
   "esri/tasks/QueryTask",
   "esri/tasks/support/Query",
+  "esri/request",
   "ditagis/classes/SystemStatusObject",
 
+  "ditagis/widgets/User",
   "ditagis/widgets/LayerEditor",
   "ditagis/widgets/Popup",
   "dojo/on",
@@ -33,152 +34,145 @@ require([
   "css!ditagis/styling/dtg-map.css"
 
 
-], function (mapconfigs, Map, MapView, OpenStreetMapLayer, MapImageLayer, FeatureLayer,
+], function (mapconfigs, Map, MapView, OpenStreetMapLayer, MapImageLayer, WebTileLayer, FeatureLayer,
   Expand, Locate, LayerList, Search,
-  QueryTask, Query,
+  QueryTask, Query, esriRequest,
   SystemStatusObject,
-  LayerEditor, Popup,
+  UserWidget, LayerEditor, Popup,
   on, domConstruct, has
 ) {
   'use strict';
   try {
-    var systemVariable = new SystemStatusObject();
-    systemVariable.user = {
-      userName:'ditagis'
-    }
-    var map = new Map({
-      // basemap: 'osm'
-    });
-
-
-    var view = new MapView({
-      container: "map", // Reference to the scene div created in step 5
-      map: map, // Reference to the map object created before the scene
-      center: mapconfigs.center,
-      zoom: mapconfigs.zoom
-    });
-
-
-    view.systemVariable = systemVariable;
-    const initBaseMap = () => {
-      let bmCfg = mapconfigs.basemap; //basemap config
-      let worldImage = new MapImageLayer({
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/',
-        title: 'Ảnh vệ tinh',
-        id: 'worldimagery',
-        visible: false,
-        imageFormat:'gif',
-        imageTransparency:false,
-        sublayers:[
-          {id:0,visible:false},
-          {id:1,visible:false},
-          {id:2,visible:false},
-          {id:3,visible:false},
-          {id:4,visible:false}
-        ]
+    esriRequest('/session', {
+      method: 'post'
+    }).then(function (esriRes) {
+      var systemVariable = new SystemStatusObject();
+      systemVariable.user = esriRes.data
+      var map = new Map({
+        // basemap: 'osm'
       });
-      let osm = new OpenStreetMapLayer({
-        title: 'Open Street Map',
-        id: 'osm',
-      })
-      map.addMany([osm, worldImage])
 
-      function watchVisible(newValue, oldValue, property, target) {
-        if (newValue) {
-          switch (target) {
-            case osm:
-              worldImage.visible = !newValue;
-              break;
-            case worldImage:
-              osm.visible = !newValue;
-              break;
+
+      var view = new MapView({
+        container: "map", // Reference to the scene div created in step 5
+        map: map, // Reference to the map object created before the scene
+        center: mapconfigs.center,
+        zoom: mapconfigs.zoom
+      });
+      view.systemVariable = systemVariable;
+      const initBaseMap = () => {
+        let bmCfg = mapconfigs.basemap; //basemap config
+        let worldImage = new WebTileLayer({
+          id: 'worldimagery',
+          urlTemplate: 'http://mt1.google.com/vt/lyrs=y&x={col}&y={row}&z={level}',
+          title: 'Ảnh vệ tinh',
+        })
+        let osm = new OpenStreetMapLayer({
+          title: 'Open Street Map',
+          id: 'osm',
+          visible: false,
+        })
+        map.addMany([osm, worldImage])
+
+        function watchVisible(newValue, oldValue, property, target) {
+          if (newValue) {
+            switch (target) {
+              case osm:
+                worldImage.visible = !newValue;
+                break;
+              case worldImage:
+                osm.visible = !newValue;
+                break;
+            }
           }
         }
+        osm.watch('visible', watchVisible)
+        worldImage.watch('visible', watchVisible)
       }
-      osm.watch('visible', watchVisible)
-      worldImage.watch('visible', watchVisible)
-    }
-    const initFeatureLayers = () => {
-      /**
-       * Lấy attachments của feature layer
-       */
-      FeatureLayer.prototype.getAttachments = function (id) {
-        return new Promise((resolve, reject) => {
-          var url = this.url + "/" + this.layerId + "/" + id;
-          esriRequest(url + "/attachments?f=json", {
-            responseType: 'json',
-            method: 'get'
-          }).then(result => {
-            resolve(result.data || null);
+      const initFeatureLayers = () => {
+        /**
+         * Lấy attachments của feature layer
+         */
+        FeatureLayer.prototype.getAttachments = function (id) {
+          return new Promise((resolve, reject) => {
+            var url = this.url + "/" + this.layerId + "/" + id;
+            esriRequest(url + "/attachments?f=json", {
+              responseType: 'json',
+              method: 'get'
+            }).then(result => {
+              resolve(result.data || null);
+            });
           });
-        });
-      }
-      let fl = new FeatureLayer({
-        url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/0',
-        outFields:['*'],
-        permission:{
-          view:true,create:true,delete:true,edit:true
         }
-      });
-      map.add(fl);
-    }
-    const initWidgets = () => {
-      view.ui.move(["zoom"], "bottom-right");
-      //LAYER LIST
-      view.ui.add(new Expand({
-        expandIconClass: "esri-icon-layer-list",
-        view: view,
-        content: new LayerList({
-          container: document.createElement("div"),
+        let fl = new FeatureLayer({
+          url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/0',
+          outFields: ['*'],
+          permission: {
+            view: true,
+            create: true,
+            delete: true,
+            edit: true
+          }
+        });
+        map.add(fl);
+      }
+      const initWidgets = () => {
+        new UserWidget(view).startup()
+        view.ui.move(["zoom"], "bottom-right");
+        //LAYER LIST
+        view.ui.add(new Expand({
+          expandIconClass: "esri-icon-layer-list",
+          view: view,
+          content: new LayerList({
+            container: document.createElement("div"),
+            view: view
+          })
+        }), "top-left");
+
+
+        //LOCATE
+        view.ui.add(new Locate({
           view: view
-        })
-      }), "top-left");
+        }), "top-left");
+        //neu khong phai la thiet bi di dong
 
-
-      //LOCATE
-      view.ui.add(new Locate({
-        view: view
-      }), "top-left");
-      //neu khong phai la thiet bi di dong
-
-      // Widget Search Features //
-      var searchWidget = new Search({
-        view: view,
-        allPlaceholder: "Nhập nội dung tìm kiếm",
-        sources: [{
-          featureLayer: map.findLayerById(constName.DONG_HO),
-          searchFields: ["NAMEDBDONGHONUOC"],
-          displayField: "NAMEDBDONGHONUOC",
-          exactMatch: false,
-          outFields: ["*"],
-          name: "Đồng hồ nước",
-          placeholder: "Tìm kiếm mã danh bộ",
-        }]
-      });
-      // Add the search widget to the top left corner of the view
-      view.ui.add(searchWidget, {
-        position: "top-right"
-      });
-      /**
-       * Layer Editor
-       */
-      var layerEditor = new LayerEditor(view);
-      layerEditor.startup();
+        // Widget Search Features //
+        var searchWidget = new Search({
+          view: view,
+          allPlaceholder: "Nhập nội dung tìm kiếm",
+          sources: [{
+            featureLayer: map.findLayerById(constName.DONG_HO),
+            searchFields: ["NAMEDBDONGHONUOC"],
+            displayField: "NAMEDBDONGHONUOC",
+            exactMatch: false,
+            outFields: ["*"],
+            name: "Đồng hồ nước",
+            placeholder: "Tìm kiếm mã danh bộ",
+          }]
+        });
+        // Add the search widget to the top left corner of the view
+        view.ui.add(searchWidget, {
+          position: "top-right"
+        });
+        /**
+         * Layer Editor
+         */
+        var layerEditor = new LayerEditor(view);
+        layerEditor.startup();
 
 
 
-      var popup = new Popup(view);
-      popup.startup();
+        var popup = new Popup(view);
+        popup.startup();
 
 
-    }
+      }
 
-    initBaseMap();
-    initFeatureLayers();
-    initWidgets();
-
-
-    Loader.hide();
+      initBaseMap();
+      initFeatureLayers();
+      initWidgets();
+      Loader.hide();
+    })
   } catch (error) {
     console.log(error);
   }
