@@ -53,7 +53,7 @@ define([
           var address = res.display_name;
           attributes['GHICHU'] = address;
           attributes['ThoiGianNhap'] = new Date().getTime();
-          attributes['NguoiNhap'] = this.view.systemVariable.user.userName;
+          attributes['NguoiNhap'] = this.view.systemVariable.user.Username;
           point.attributes = attributes;
           let edits = {
             addFeatures: [point]
