@@ -35,24 +35,23 @@ define([
                 }
             ]
         },
-        layers: [{
-            title: 'Trồng trọt',
-            id: "TrongTrot",
-            url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/BaoVeThucVat/FeatureServer/2",
-            outFields: ['*'],
-        }, {
-            title: 'Sâu bệnh',
-            id: "SauBenh",
-            url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/BaoVeThucVat/FeatureServer/1",
+        BangMaDanhBo: {
+            title: 'Bảng Mã Danh Bộ',
+            id: 'BangMaDanhBo',
+            url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1',
             outFields: ['*']
-            
-        },{
-            title: 'Doanh nghiệp',
-            id: "DoanhNghiep",
-            url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/BaoVeThucVat/FeatureServer/0",
+        }
+        ,
+        KSDongHoNuocLayer: {
+            title: 'Khảo sát đồng hồ nước',
+            id: "KSDongHoNuoc",
+            url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/0",
             outFields: ['*'],
-        } ,
-        ],
+            permission: {
+                view: true, create: true, delete: true, edit: true
+            }
+        }
+        ,
         zoom: 13,
         center: [106.7502031, 10.7803536]
     }
