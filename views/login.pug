@@ -22,9 +22,10 @@ html
 					label Mật khẩu
 					input.form-control(type='password', id='pass-tf', name='password')
 				.controls
-					button(type='button').btn.btn-default.button-rememember-me
+					button(type='button').btn.btn-default.button-rememember-me#remember
 						span.glyphicon.glyphicon-unchecked.button-rememember-me-glyph
 						| Nhớ mật khẩu
+					input(type="hidden",name="remember",value="false")
 					button(type='submit').btn.btn-primary.button-sign-in
 						span.glyphicon.glyphicon-lock
 						| Đăng nhập
@@ -37,6 +38,4 @@ html
 		script(src='javascripts/lib/jquery-2.2.3.min.js')
 		script(src='javascripts/lib/jquery.form.min.js')
 		script(src='javascripts/lib/bootstrap.min.js')
-		script(src='javascripts/account/views/login.js')
-		script(src='javascripts/account/controllers/loginController.js')
-		script(src='javascripts/account/form-validators/loginValidator.js')
+		script(src='/javascripts/lib/login.js')

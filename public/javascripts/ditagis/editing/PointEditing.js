@@ -45,11 +45,6 @@ define([
         //lấy thông tin cập nhật gồm người tạo và thời gian tạo
 
 
-        $.get('http://nominatim.openstreetmap.org/reverse', {
-          format: 'json',
-          lat: point.geometry.latitude,
-          lon: point.geometry.longitude
-        }).done((res) => {
           var address = res.display_name;
           attributes['GHICHU'] = address;
           attributes['ThoiGianNhap'] = new Date().getTime();
@@ -84,7 +79,6 @@ define([
             }
 
           })
-        })
       } catch (err) {
         console.log(err);
       }
