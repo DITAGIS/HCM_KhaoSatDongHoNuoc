@@ -211,6 +211,7 @@ define([
       try {
         if (this.attributes) {
           var inputMaDanhBo = document.getElementById("MaDanhBo");
+          var inputDiaChi = document.getElementById("DiaChi");
           //kiem tra ma danh bo
           //neu trung thi khong cho cap nhat
           //dong thoi xoa luon diem moi them
@@ -230,6 +231,8 @@ define([
             } else {
               
               this.attributes.MaDanhBo = inputMaDanhBo.value;
+              this.attributes.DiaChi = inputDiaChi.value;
+
               var inputTinhTrang = document.getElementById("TinhTrang");
               this.attributes.TinhTrang = inputTinhTrang.value;
               this.layer.applyEdits({
