@@ -64,7 +64,7 @@ require([
         let bmCfg = mapconfigs.basemap; //basemap config
         let worldImage = new WebTileLayer({
           id: 'worldimagery',
-          urlTemplate: 'http://mt1.google.com/vt/lyrs=y&x={col}&y={row}&z={level}',
+          urlTemplate: 'https://mt1.google.com/vt/lyrs=y&x={col}&y={row}&z={level}',
           title: 'Ảnh vệ tinh',
         })
         let osm = new OpenStreetMapLayer({
@@ -105,6 +105,7 @@ require([
           });
         }
         let fl = new FeatureLayer({
+          id:constName.DONG_HO,
           url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/0',
           outFields: ['*'],
           permission: {
@@ -142,8 +143,8 @@ require([
           allPlaceholder: "Nhập nội dung tìm kiếm",
           sources: [{
             featureLayer: map.findLayerById(constName.DONG_HO),
-            searchFields: ["NAMEDBDONGHONUOC"],
-            displayField: "NAMEDBDONGHONUOC",
+            searchFields: ["MADANHBO"],
+            displayField: "MADANHBO",
             exactMatch: false,
             outFields: ["*"],
             name: "Đồng hồ nước",

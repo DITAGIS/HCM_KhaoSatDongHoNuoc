@@ -20,14 +20,15 @@ app.use(session({
   secret: 'faeb4453e5d14fe6f6d04637f78077c76c73d1b4',
   resave: true,
   saveUninitialized: true,
-})
-);
+}));
 
 // uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -42,17 +43,19 @@ passport.serializeUser((user, done) => {
 })
 passport.deserializeUser((user, done) => {
   console.log('deserializeUser');
-    done(null, user);
+  done(null, user);
 })
 passport.use(new LocalStrategy(
   function (username, password, done) {
-    database.isUser(username,password)
+    database.isUser(username, password)
       .then(function (user) {
         // bcrypt.compare(password, user.Password, function (err, result) {
-          if (!user) {
-            return done(null, false, { message: 'Incorrect username and password' });
-          }
-          return done(null, user);
+        if (!user) {
+          return done(null, false, {
+            message: 'Incorrect username and password'
+          });
+        }
+        return done(null, user);
         // })
       }).catch(function (err) {
         return done(err);
@@ -67,12 +70,27 @@ app.post('/session', function (req, res) {
     res.status(400).send();
 })
 app.get('/login', (req, res) => {
-  res.render('login', { title: 'Đăng nhập' });
+  res.render('login', {
+    title: 'Đăng nhập'
+  });
 });
 app.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login'
-}))
+  failureRedirect: '/login',
+  failureFlash: true
+}), function (req, res) {
+  if (req.body.remember == "true") {
+    req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
+  } else {
+    req.session.cookie.expires = false; // Cookie expires at end of session
+  }
+  res.redirect('/')
+})
+app.get('/logout', (req, res) => {
+  res.clearCookie('passport');
+  req.session.destroy();
+  res.redirect('/');
+  res.end()
+})
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   var err = new Error('Not Found');

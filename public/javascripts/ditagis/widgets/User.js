@@ -94,7 +94,7 @@ define([
              * Đăng xuất tài khoản
              */
             logoutClickHandler(){
-                location.href='/account/logout';
+                location.href='/logout';
             }
             successLogout(){
 
