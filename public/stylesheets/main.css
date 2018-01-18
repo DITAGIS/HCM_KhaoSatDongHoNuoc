@@ -1,0 +1,221 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+div#viewDiv {
+  width: 100%;
+  height: 100%;
+}
+.center.sliding{
+  font-weight: 700
+}
+.navbar-inner{
+  background: #b72f20;
+  color: white;
+  
+}
+i.fa.fa-angle-left {
+  font-size: 35px;
+  font-weight: bold;
+  color: white;
+}
+.center.sliding{
+  text-transform: uppercase;
+  color: white;
+}
+a#addSuCo{
+  background: #b72f20;
+  position:absolute;
+  bottom:0;
+}
+a.button.button-big.active.ac-3{
+  width: 100%
+}
+form#attachment-data{
+  margin: auto;
+}
+.checked {
+  color: orange;
+}
+.page-content{
+  background: rgb(221, 223, 226);
+}
+form.list-fields{
+  background: white;
+  margin: 0 1%;
+  border: 1px solid #989494;
+  border-radius: 10px;
+}
+
+input.fvalue{
+  width: 100%;
+  padding: 10px 10px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-bottom: 2px solid #B7B7B7;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+select {
+  width: 100%;
+  padding: 10px 10px;
+  line-height: 40px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 40px;
+  font-size: 16px;
+}
+label.button {
+  border: 1px solid #666666;
+  border-radius: 4px;
+  line-height: 40px;
+  height: 40px;
+  color: black;
+  font-weight: bold;
+  background-color: #ccc;
+  font-size: 15px;
+}
+ul{
+  list-style-type: none;
+  margin: 2px 5%;
+}
+li.field{
+  padding: 5px 0;
+}
+li#field-images {
+  display: none;
+}
+li#field-attach {
+  display: none;
+}
+label.flabel{
+  font-size: 15px;
+  /* font-weight: bold; */
+}
+.content-title-group{
+  margin: 0;
+  font-size: 15px;
+  text-transform: uppercase;
+  line-height: 1;
+  color: black;
+  margin: 5px 5%;
+  padding: 10px 0px 0px;
+  font-weight: bold;
+}
+div#mapImage {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+div#minimap{
+  height: 100px;
+}
+i.fa.fa-map-pin.esri-component{
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: green;
+  font-size: xx-large;
+}
+label.coordinate {
+  font-size: 15px;
+}
+
+th {
+  text-align: left;
+  padding: 0 10px;
+}
+td.lat, td.long {
+  font-size: 15px;
+}
+#location{
+  background-color: #109D59;
+  color: white;
+  height: 35px;
+  line-height: 35px;
+}
+.toolbar-inner{
+  background-color: #109D59;
+  color: white;
+}
+a#getlocation {
+  border: none;
+  background-color: #109D59;
+  color: white;
+  font-size: 40px;
+}
+div#getData {
+  background-color: #109D59;
+  color: white;
+}
+.popup-content{
+  background: white;
+}
+.swiper-container {
+  height: 84%;
+  background: #000;
+  opacity: 0.9;
+}
+
+.swiper-slide {
+  background: #000;
+  position: relative;
+  height: 100%;
+}
+
+.swiper-slide img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.swiper-pagination{
+  height: 30px;
+  line-height: 30px;
+  margin-bottom: 0px;
+}
+.swiper-pagination-bullet {
+  background: white;
+  opacity: 1;
+}
+.swiper-pagination-bullet-active {
+  opacity: 1;
+  background: #007aff;
+}
+
+i.fa.fa-trash-o{
+  font-size: 25px;
+}
+.item-media.trash {
+  color: red;
+}
+.item-media.camera {
+  color: #000;
+  padding-left: 10px;
+}
+label.fa.fa-camera{
+  padding-left: 10px;
+  font-size: 25px;
+}
+div#field-camera{
+  display: grid;
+  grid-template-columns: 47% auto 47%;
+  padding-top: 5px;
+}
+input#inputFiles{
+  width: 1px;
+  /* display: none; */
+}
+.h5-label{
+  display: block;
+  font-size: .83em;
+  margin-left: 0;
+  margin-right: 0;
+  font-weight: bold;
+}
