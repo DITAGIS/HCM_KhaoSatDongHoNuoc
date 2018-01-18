@@ -146,14 +146,19 @@ define([
         } else {
           let inputType;
           //neu du lieu qua lon thi hien thi textarea
+          let type = field.name === "MaDanhBo"?"tel":"string"
           input = domConstruct.create('input', {
-            type: "tel",
+            type: type,
             class: "form-control",
             name: field.name,
             id: field.name
           });
-          if (this.attributes[field.name])
+          if (this.attributes[field.name]) {
             input.setAttribute('value', this.attributes[field.name]);
+            if (field.name === 'MaDanhBo')
+              input.readOnly = true;
+          }
+
         }
         domConstruct.place(input, tdValue);
         domConstruct.place(tdName, row);
@@ -210,58 +215,85 @@ define([
         if (this.attributes) {
           var inputMaDanhBo = document.getElementById("MaDanhBo");
           var inputDiaChi = document.getElementById("DiaChi");
+          var inputTinhTrang = document.getElementById("TinhTrang");
+          var inputGhiChu = document.getElementById("GhiChu");
           //kiem tra ma danh bo
           //neu trung thi khong cho cap nhat
           //dong thoi xoa luon diem moi them
-          this.isValidDanhBo(inputMaDanhBo.value).then(tblVal => {
-            const isValid = tblVal !== null;
-            if (!isValid) {
-              notify.update({
-                'type': 'danger',
-                'message': 'Không tồn tại mã danh bộ!',
-                'progress': 90
-              });
-              this.layer.applyEdits({
-                deleteFeatures: [{
-                  objectId: this.attributes['OBJECTID']
-                }]
-              })
-              this.view.popup.close();
-            } else {
+          if (this.attributes['MaDanhBo']) {
+            this.attributes.DiaChi = inputDiaChi.value;
+            this.attributes.TinhTrang = inputTinhTrang.value;
+            this.attributes.GhiChu = inputGhiChu.value;
+            this.layer.applyEdits({
+              updateFeatures: [{
+                attributes: this.attributes
+              }]
+            }).then((res) => {
+              //khi applyEdits, nếu phát hiện lỗi
+              if (res.updateFeatureResults[0].error) {
+                notify.update({
+                  'type': 'danger',
+                  'message': 'Cập nhật thất bại!',
+                  'progress': 90
+                });
+              } else {
+                notify.update({
+                  'type': 'success',
+                  'message': 'Cập nhật thành công!',
+                  'progress': 90
+                });
+                this.view.popup.close();
+              }
+            })
+          } else {
+            this.isValidDanhBo(inputMaDanhBo.value).then(tblVal => {
+              const isValid = tblVal !== null;
+              if (!isValid) {
+                notify.update({
+                  'type': 'danger',
+                  'message': 'Không tồn tại mã danh bộ!',
+                  'progress': 90
+                });
+                this.layer.applyEdits({
+                  deleteFeatures: [{
+                    objectId: this.attributes['OBJECTID']
+                  }]
+                })
+                this.view.popup.close();
+              } else {
 
-              this.attributes.MaDanhBo = inputMaDanhBo.value;
-              this.attributes.DiaChi = inputDiaChi.value;
-
-              var inputTinhTrang = document.getElementById("TinhTrang");
-              this.attributes.TinhTrang = inputTinhTrang.value;
-              this.layer.applyEdits({
-                updateFeatures: [{
-                  attributes: this.attributes
-                }]
-              }).then((res) => {
-                //khi applyEdits, nếu phát hiện lỗi
-                if (res.updateFeatureResults[0].error) {
-                  notify.update({
-                    'type': 'danger',
-                    'message': 'Cập nhật thất bại!',
-                    'progress': 90
-                  });
-                }
-                //không phát hiện lỗi nên tắt popup
-                else {
-                  notify.update({
-                    'type': 'success',
-                    'message': 'Cập nhật thành công!',
-                    'progress': 90
-                  });
-                  this.view.popup.close();
-                  this.tableData.applyEdits({
-                    deleteFeatures: [tblVal.attributes['OBJECTID']]
-                  });
-                }
-              })
-            }
-          })
+                this.attributes.MaDanhBo = inputMaDanhBo.value;
+                this.attributes.DiaChi = inputDiaChi.value;
+                this.attributes.TinhTrang = inputTinhTrang.value;
+                this.layer.applyEdits({
+                  updateFeatures: [{
+                    attributes: this.attributes
+                  }]
+                }).then((res) => {
+                  //khi applyEdits, nếu phát hiện lỗi
+                  if (res.updateFeatureResults[0].error) {
+                    notify.update({
+                      'type': 'danger',
+                      'message': 'Cập nhật thất bại!',
+                      'progress': 90
+                    });
+                  }
+                  //không phát hiện lỗi nên tắt popup
+                  else {
+                    notify.update({
+                      'type': 'success',
+                      'message': 'Cập nhật thành công!',
+                      'progress': 90
+                    });
+                    this.view.popup.close();
+                    this.tableData.applyEdits({
+                      deleteFeatures: [tblVal.attributes['OBJECTID']]
+                    });
+                  }
+                })
+              }
+            })
+          }
 
         }
 

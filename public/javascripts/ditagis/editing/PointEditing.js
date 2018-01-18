@@ -45,40 +45,37 @@ define([
         //lấy thông tin cập nhật gồm người tạo và thời gian tạo
 
 
-          var address = res.display_name;
-          attributes['GHICHU'] = address;
-          attributes['ThoiGianNhap'] = new Date().getTime();
-          attributes['NguoiNhap'] = this.view.systemVariable.user.Username;
-          point.attributes = attributes;
-          let edits = {
-            addFeatures: [point]
-          };
-          layer.applyEdits(edits).then((result) => {
-            if (result.addFeatureResults[0].error) {
-              notify.update({
-                'type': 'danger',
-                'progress': 90
-              });
+        attributes['ThoiGianNhap'] = new Date().getTime();
+        attributes['NguoiNhap'] = this.view.systemVariable.user.Username;
+        point.attributes = attributes;
+        let edits = {
+          addFeatures: [point]
+        };
+        layer.applyEdits(edits).then((result) => {
+          if (result.addFeatureResults[0].error) {
+            notify.update({
+              'type': 'danger',
+              'progress': 90
+            });
 
-            } else {
-              notify.update({
-                'type': 'success',
-                'progress': 90
-              });
-              layer.queryFeatures({
-                where: 'OBJECTID = ' + result.addFeatureResults[0].objectId,
-                outFields: ['*'],
-                returnGeometry: true,
-                outSpatialReference: this.view.spatialReference
-              }).then(results => {
-                this.view.popup.open({
-                  features: results.features,
-                  location: results.features[0].geometry
-                })
+          } else {
+            notify.update({
+              'type': 'success',
+              'progress': 99
+            });
+            layer.queryFeatures({
+              where: 'OBJECTID = ' + result.addFeatureResults[0].objectId,
+              outFields: ['*'],
+              returnGeometry: true,
+              outSpatialReference: this.view.spatialReference
+            }).then(results => {
+              this.view.popup.open({
+                features: results.features,
+                location: results.features[0].geometry
               })
-            }
-
-          })
+            })
+          }
+        })
       } catch (err) {
         console.log(err);
       }
