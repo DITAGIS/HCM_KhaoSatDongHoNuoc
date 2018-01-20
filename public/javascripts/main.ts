@@ -9,7 +9,6 @@ import MapEditor = require('./MapEditor');
 import mapconfig = require('./config');
 import esriRequest = require("esri/request");
 import { Dom7 } from "Dom7";
-var myApp: Framework7, mainView: Framework7.View, $$ = Dom7;
 var user;
 var map, miniView: MapView, mapEditor: MapEditor;
 // esriRequest('/session', {
@@ -17,12 +16,15 @@ var map, miniView: MapView, mapEditor: MapEditor;
 // }).then(function (esriRes) {
 //   user = esriRes.data;
 // })
+var myApp: Framework7, mainView: Framework7.View, $$ = Dom7;
+initMobile();
+myApp.showPreloader("Đang tải...");
 map = new Map({
-  basemap: "osm",
+  basemap: "osm"
 });
 miniView = new MapView({
   container: "minimap",
-  map: map,
+  map: map, constraints: ["attribution"]
 });
 miniView.ui.empty("top-left");
 var node = document.createElement("i");
@@ -34,11 +36,30 @@ miniView.on('click', (evt) => {
 miniView.on('drag', (evt) => {
   selectLocation();
 })
-initMobile();
+
 var layer = new FeatureLayer({
   minScale: 30000,
+  id:"mainLayer",
   url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/0",
   outFields: ["*"],
+  popupTemplate: {
+    title: "Danh bộ: {MaDanhBo}",
+    content: [
+      {
+        type: "fields", fieldInfos: [{
+          fieldName: "DiaChi",
+          label: "Địa chỉ",
+        }, {
+          fieldName: "GhiChu", label: "Ghi chú"
+        }]
+      }
+    ],
+    actions: [
+      {
+        className: "esri-icon-map-pin", id: "cap-nhat-vi-tri", title: "Cập nhật vị trí"
+      }
+    ]
+  }
 });
 map.add(layer);
 layer.then(function () {
@@ -54,7 +75,10 @@ layer.then(function () {
     let input: HTMLElement;
     if (f.domain) {
       input = document.createElement("select");
-      input.setAttribute("placeholder", "Chọn");
+      let option = document.createElement('option');
+      option.innerText = "Chọn giá trị";
+      option.value = null;
+      input.appendChild(option);
       (f.domain as __esri.CodedValueDomain).codedValues.forEach(function (domain) {
         let option = document.createElement('option');
         option.innerText = domain.name;
@@ -73,6 +97,7 @@ layer.then(function () {
     li.appendChild(input);
     container.appendChild(li);
   })
+  myApp.hidePreloader();
 })
 function initMapEditor() {
   mapEditor = new MapEditor({
@@ -113,7 +138,7 @@ function clearAttributes() {
   layer.fields.forEach(function (f) {
     clearData[f.name] = f.type === "string" ? "" : -1;
   })
-  myApp.formFromJSON("#personInfoForm", clearData)
+  myApp.formFromJSON("#infoForm", clearData)
   // miniView.goTo(<__esri.MapViewGoToTarget>{
   //   center: mapconfig.center, zoom: mapconfig.zoom
   // })
@@ -121,8 +146,9 @@ function clearAttributes() {
 }
 
 function applyEditFeatures() {
+  myApp.showPreloader("Đang cập nhật...");
   var attributes = {};
-  var formAttr = myApp.formToJSON('#personInfoForm');
+  var formAttr = myApp.formToJSON('#infoForm');
   if (!formAttr.MaDanhBo || (miniView.center.x < 0 || miniView.center.y < 0)) {
     let message = 'Vui lòng điền đầy đủ các thông tin trên';
     myApp.addNotification({
@@ -157,6 +183,7 @@ function applyEditFeatures() {
         message: message,
         hold: 3000
       });
+    myApp.hidePreloader();
   });
 
 }

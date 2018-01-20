@@ -10,7 +10,7 @@ div#viewDiv {
   font-weight: 700
 }
 .navbar-inner{
-  background: #b72f20;
+  background: #2196F3;
   color: white;
   
 }
@@ -24,7 +24,7 @@ i.fa.fa-angle-left {
   color: white;
 }
 a#addSuCo{
-  background: #b72f20;
+  background: #2196F3;
   position:absolute;
   bottom:0;
 }
@@ -113,7 +113,7 @@ div#minimap{
 }
 i.fa.fa-map-pin.esri-component{
   left: 50%;
-  top: 50%;
+  top: calc(50% - 16px);
   transform: translate(-50%, -50%);
   color: green;
   font-size: xx-large;
@@ -130,23 +130,25 @@ td.lat, td.long {
   font-size: 15px;
 }
 #location{
-  background-color: #109D59;
+  background-color: #2196F3;
   color: white;
   height: 35px;
   line-height: 35px;
 }
 .toolbar-inner{
-  background-color: #109D59;
+  background-color: #2196F3;
   color: white;
 }
-a#getlocation {
+a.action{
   border: none;
-  background-color: #109D59;
+  background-color: #2196F3;
   color: white;
   font-size: 40px;
+  height: 44px;
+  line-height: 42px;
 }
 div#getData {
-  background-color: #109D59;
+  background-color: #2196F3;
   color: white;
 }
 .popup-content{
@@ -218,4 +220,7 @@ input#inputFiles{
   margin-left: 0;
   margin-right: 0;
   font-weight: bold;
+}
+.hidden{
+  display: none;
 }

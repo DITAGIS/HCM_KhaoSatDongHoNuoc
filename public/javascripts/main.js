@@ -1,15 +1,17 @@
 define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "./MapEditor"], function (require, exports, Map, FeatureLayer, MapView, Graphic, MapEditor) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var myApp, mainView, $$ = Dom7;
     var user;
     var map, miniView, mapEditor;
+    var myApp, mainView, $$ = Dom7;
+    initMobile();
+    myApp.showPreloader("Đang tải...");
     map = new Map({
-        basemap: "osm",
+        basemap: "osm"
     });
     miniView = new MapView({
         container: "minimap",
-        map: map,
+        map: map, constraints: ["attribution"]
     });
     miniView.ui.empty("top-left");
     var node = document.createElement("i");
@@ -21,11 +23,29 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
     miniView.on('drag', (evt) => {
         selectLocation();
     });
-    initMobile();
     var layer = new FeatureLayer({
         minScale: 30000,
+        id: "mainLayer",
         url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/0",
         outFields: ["*"],
+        popupTemplate: {
+            title: "Danh bộ: {MaDanhBo}",
+            content: [
+                {
+                    type: "fields", fieldInfos: [{
+                            fieldName: "DiaChi",
+                            label: "Địa chỉ",
+                        }, {
+                            fieldName: "GhiChu", label: "Ghi chú"
+                        }]
+                }
+            ],
+            actions: [
+                {
+                    className: "esri-icon-map-pin", id: "cap-nhat-vi-tri", title: "Cập nhật vị trí"
+                }
+            ]
+        }
     });
     map.add(layer);
     layer.then(function () {
@@ -42,7 +62,10 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             let input;
             if (f.domain) {
                 input = document.createElement("select");
-                input.setAttribute("placeholder", "Chọn");
+                let option = document.createElement('option');
+                option.innerText = "Chọn giá trị";
+                option.value = null;
+                input.appendChild(option);
                 f.domain.codedValues.forEach(function (domain) {
                     let option = document.createElement('option');
                     option.innerText = domain.name;
@@ -63,6 +86,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             li.appendChild(input);
             container.appendChild(li);
         });
+        myApp.hidePreloader();
     });
     function initMapEditor() {
         mapEditor = new MapEditor({
@@ -96,11 +120,12 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
         layer.fields.forEach(function (f) {
             clearData[f.name] = f.type === "string" ? "" : -1;
         });
-        myApp.formFromJSON("#personInfoForm", clearData);
+        myApp.formFromJSON("#infoForm", clearData);
     }
     function applyEditFeatures() {
+        myApp.showPreloader("Đang cập nhật...");
         var attributes = {};
-        var formAttr = myApp.formToJSON('#personInfoForm');
+        var formAttr = myApp.formToJSON('#infoForm');
         if (!formAttr.MaDanhBo || (miniView.center.x < 0 || miniView.center.y < 0)) {
             let message = 'Vui lòng điền đầy đủ các thông tin trên';
             myApp.addNotification({
@@ -137,6 +162,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                     message: message,
                     hold: 3000
                 });
+            myApp.hidePreloader();
         });
     }
 });
