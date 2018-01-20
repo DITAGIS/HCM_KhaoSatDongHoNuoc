@@ -1,7 +1,7 @@
 import Locate = require("esri/widgets/Locate");
 import Map = require("esri/Map");
 import MapView = require("esri/views/MapView");
-import mapconfig = require("./config");
+import mapconfig = require("../config");
 import { Point } from "esri/geometry";
 import Graphic = require("esri/Graphic");
 class MapEditor {
@@ -17,6 +17,11 @@ class MapEditor {
             map: options.map,
             zoom: mapconfig.zoom, // Sets the zoom level based on level of detail (LOD)
             center: mapconfig.center,
+            popup:{
+                dockEnabled:false,dockOptions:{
+                    buttonEnabled:false
+                }
+              }
         });
         this.view.popup.on("trigger-action", (e) => {
             if (e.action.id === "cap-nhat-vi-tri") {

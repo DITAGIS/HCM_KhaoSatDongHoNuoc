@@ -12,11 +12,10 @@
   <link rel="stylesheet" href="/stylesheets/framework7.ios.min.css">
 
   <link rel="stylesheet" href="/stylesheets/framework7.ios.colors.min.css">
-  <link rel="stylesheet" href="https://framework7.io/dist/css/framework7.min.css">
   <link rel='stylesheet' , href='https://js.arcgis.com/4.5/esri/css/main.css'>
   <link rel='stylesheet' , href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css'>
   <!-- Path to your custom app styles-->
-  <link rel="stylesheet" href="stylesheets/main.css">
+  <link rel="stylesheet" href="/stylesheets/main.css">
   <link rel="stylesheet" href="/stylesheets/framework7-icons.css">
 
 </head>
@@ -37,15 +36,38 @@
         <div data-page="form" class="page">
           <!-- Scrollable page content-->
           <div class="page-content">
-            <div class="list links-list">
-              <ul>
-                <li>
-                  <a href="/khaosat">Khảo sát</a>
-                </li>
-                <li>
-                  <a href="/capnhat">Cập nhật</a>
+            <div class="content-title-group">Thông tin</div>
+            <form id="infoForm" class="list-fields">
+              <ul id="form-container">
+                <li class="field">
+                  <label class="flabel" for="mota">Vị trí</label>
+                  <div id="mapImage" class="map">
+                    <div id="location">
+                      <table>
+                        <tr>
+                          <th>
+                            <label for="lat" class="coordinate">Kinh độ: </label>
+                          </th>
+                          <td class="lat"> </td>
+                          <th>
+                            <label for="long" class="coordinate">Vĩ độ: </label>
+                          </th>
+                          <td class="long"></td>
+                        </tr>
+                      </table>
+                    </div>
+
+                  </div>
+                  <div id="minimap"></div>
                 </li>
               </ul>
+            </form>
+            <div class="toolbar hide-toolbar-on-scroll">
+              <div id="btnSubmit" class="toolbar-inner">
+                <div style="text-align:  center;width:  100%;font-weight: 700;">
+                  Cập nhật
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -54,16 +76,16 @@
   </div>
   <!-- Path to Framework7 Library JS-->
   <script type="text/javascript" src="/javascripts/lib/framework7.min.js"></script>
-  <!-- <script>
+  <script>
     var dojoConfig = {
-      deps: ["app/main"],
+      deps: ["app/khaosat/main"],
       packages: [{
         name: "app",
-        location: location.href.replace(/\/[^/]+$/, "/") + "javascripts/"
+        location: location.origin + "/javascripts"
       }, ]
     }
   </script>
-  <script src='https://js.arcgis.com/4.5/'></script> -->
+  <script src='https://js.arcgis.com/4.5/'></script>
 </body>
 
 </html>

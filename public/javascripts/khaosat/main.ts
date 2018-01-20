@@ -5,8 +5,8 @@ import Graphic = require("esri/Graphic");
 import Locate = require("esri/widgets/Locate");
 import QueryTask = require("esri/tasks/QueryTask");
 import Query = require("esri/tasks/support/Query");
-import MapEditor = require('./MapEditor');
-import mapconfig = require('./config');
+import MapEditor = require('./Map');
+import mapconfig = require('../config');
 import esriRequest = require("esri/request");
 import { Dom7 } from "Dom7";
 var user;
@@ -24,16 +24,13 @@ map = new Map({
 });
 miniView = new MapView({
   container: "minimap",
-  map: map, constraints: ["attribution"]
+  map: map
 });
 miniView.ui.empty("top-left");
 var node = document.createElement("i");
 node.classList.add("fa", "fa-map-pin")
 miniView.ui.add(node);
 miniView.on('click', (evt) => {
-  selectLocation();
-})
-miniView.on('drag', (evt) => {
   selectLocation();
 })
 
@@ -54,11 +51,6 @@ var layer = new FeatureLayer({
         }]
       }
     ],
-    actions: [
-      {
-        className: "esri-icon-map-pin", id: "cap-nhat-vi-tri", title: "Cập nhật vị trí"
-      }
-    ]
   }
 });
 map.add(layer);

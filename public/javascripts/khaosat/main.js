@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "./MapEditor"], function (require, exports, Map, FeatureLayer, MapView, Graphic, MapEditor) {
+define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "./Map"], function (require, exports, Map, FeatureLayer, MapView, Graphic, MapEditor) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var user;
@@ -11,16 +11,13 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
     });
     miniView = new MapView({
         container: "minimap",
-        map: map, constraints: ["attribution"]
+        map: map
     });
     miniView.ui.empty("top-left");
     var node = document.createElement("i");
     node.classList.add("fa", "fa-map-pin");
     miniView.ui.add(node);
     miniView.on('click', (evt) => {
-        selectLocation();
-    });
-    miniView.on('drag', (evt) => {
         selectLocation();
     });
     var layer = new FeatureLayer({
@@ -40,11 +37,6 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                         }]
                 }
             ],
-            actions: [
-                {
-                    className: "esri-icon-map-pin", id: "cap-nhat-vi-tri", title: "Cập nhật vị trí"
-                }
-            ]
         }
     });
     map.add(layer);

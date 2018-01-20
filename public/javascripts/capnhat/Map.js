@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/widgets/Locate", "esri/views/MapView", "./config", "esri/Graphic"], function (require, exports, Locate, MapView, mapconfig, Graphic) {
+define(["require", "exports", "esri/widgets/Locate", "esri/views/MapView", "../config", "esri/Graphic"], function (require, exports, Locate, MapView, mapconfig, Graphic) {
     "use strict";
     class MapEditor {
         constructor(options) {
@@ -8,6 +8,11 @@ define(["require", "exports", "esri/widgets/Locate", "esri/views/MapView", "./co
                 map: options.map,
                 zoom: mapconfig.zoom,
                 center: mapconfig.center,
+                popup: {
+                    dockEnabled: false, dockOptions: {
+                        buttonEnabled: false
+                    }
+                }
             });
             this.view.popup.on("trigger-action", (e) => {
                 if (e.action.id === "cap-nhat-vi-tri") {
