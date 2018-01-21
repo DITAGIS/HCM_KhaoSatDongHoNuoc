@@ -11,3 +11,7 @@ i.esri-icon-map-pin.esri-component{
 .hidden{
   display: none;
 }
+#miniView{
+  height: 120px;
+  width: 100%;
+}

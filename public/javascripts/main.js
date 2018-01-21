@@ -1,4 +1,4 @@
-define(["require", "exports", "./capnhat/main", "./routes"], function (require, exports, CapNhatPage, routes) {
+define(["require", "exports", "./capnhat/main", "./khaosat/main", "./routes"], function (require, exports, CapNhatPage, KhaoSatPage, routes) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var app = window.app;
@@ -7,8 +7,11 @@ define(["require", "exports", "./capnhat/main", "./routes"], function (require, 
         if (page.name === "cap-nhat") {
             new CapNhatPage({ app: app }).run();
         }
+        else if (page.name === "khao-sat") {
+            new KhaoSatPage({ app: app }).run();
+        }
     });
     var mainView = app.views.create('.view-main', {
-        url: '/'
+        url: '/', domCache: true, uniqueHistory: true
     });
 });
