@@ -4,66 +4,57 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
-  <!-- <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black"> -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#2196f3">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
   <title>TRUNG TÂM DITAGIS - KHẢO SÁT ĐỒNG HỒ NƯỚC </title>
-  <!-- Path to Framework7 Library CSS-->
-
-  <link rel="stylesheet" href="/stylesheets/framework7.ios.min.css">
-
-  <link rel="stylesheet" href="/stylesheets/framework7.ios.colors.min.css">
-  <link rel="stylesheet" href="https://framework7.io/dist/css/framework7.min.css">
   <link rel='stylesheet' , href='https://js.arcgis.com/4.5/esri/css/main.css'>
-  <link rel='stylesheet' , href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css'>
-  <!-- Path to your custom app styles-->
-  <link rel="stylesheet" href="stylesheets/main.css">
+  <link rel="stylesheet" href="/stylesheets/framework7.min.css">
   <link rel="stylesheet" href="/stylesheets/framework7-icons.css">
-
+  <link rel="stylesheet" href="/stylesheets/main.css">
 </head>
 
 <body>
-  <div class="views">
-    <div class="view view-main">
+  <div class="view view-main">
+    <div class="page" data-name="home">
       <div class="navbar">
         <div class="navbar-inner">
           <div class="left"></div>
-          <div class="center sliding">Khảo sát đồng hồ nước</div>
+          <div class="title">Khảo sát đồng hồ nước</div>
           <div class="right"></div>
           <!-- We have home navbar without left link-->
-
         </div>
       </div>
-      <div class="pages navbar-through toolbar-fixed">
-        <div data-page="form" class="page">
-          <!-- Scrollable page content-->
-          <div class="page-content">
-            <div class="list links-list">
-              <ul>
-                <li>
-                  <a href="/khaosat">Khảo sát</a>
-                </li>
-                <li>
-                  <a href="/capnhat">Cập nhật</a>
-                </li>
-              </ul>
-            </div>
-          </div>
+      <!-- Scrollable page content-->
+      <div class="page-content">
+        <div class="list">
+          <ul>
+            <li>
+              <a href="/khaosat/index.html" class="item-content item-link">Khảo sát</a>
+            </li>
+            <li>
+              <a href="/cap-nhat/" class="item-content item-link">Cập nhật</a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
   </div>
   <!-- Path to Framework7 Library JS-->
   <script type="text/javascript" src="/javascripts/lib/framework7.min.js"></script>
-  <!-- <script>
+  <script>
+    var app = new Framework7();
     var dojoConfig = {
       deps: ["app/main"],
       packages: [{
         name: "app",
-        location: location.href.replace(/\/[^/]+$/, "/") + "javascripts/"
+        location: location.origin + "/javascripts"
       }, ]
     }
   </script>
-  <script src='https://js.arcgis.com/4.5/'></script> -->
+  <script src='https://js.arcgis.com/4.5/'></script>
 </body>
 
 </html>

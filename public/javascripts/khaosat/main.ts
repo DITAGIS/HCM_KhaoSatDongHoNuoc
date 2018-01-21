@@ -8,7 +8,6 @@ import Query = require("esri/tasks/support/Query");
 import MapEditor = require('./Map');
 import mapconfig = require('../config');
 import esriRequest = require("esri/request");
-import { Dom7 } from "Dom7";
 var user;
 var map, miniView: MapView, mapEditor: MapEditor;
 // esriRequest('/session', {
@@ -16,7 +15,7 @@ var map, miniView: MapView, mapEditor: MapEditor;
 // }).then(function (esriRes) {
 //   user = esriRes.data;
 // })
-var myApp: Framework7, mainView: Framework7.View, $$ = Dom7;
+var myApp, mainView, $$ = Dom7;
 initMobile();
 myApp.showPreloader("Đang tải...");
 map = new Map({

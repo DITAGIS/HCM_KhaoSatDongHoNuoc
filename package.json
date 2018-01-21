@@ -1,13 +1,12 @@
 {
-  "name": "sub-phananhsuco",
-  "version": "0.0.0",
+  "name": "HCM_KSDHN",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "node ./www"
   },
   "dependencies": {
     "@types/arcgis-js-api": "^4.5.0",
-    "@types/framework7": "git+https://github.com/JasonKleban/Framework7.d.ts.git",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
