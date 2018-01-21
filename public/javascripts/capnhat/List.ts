@@ -1,10 +1,14 @@
 var $ = Dom7;
+import User = require('../ditagis/User');
+
 class List {
   private app;
   private layer: __esri.FeatureLayer;
-  constructor(options: { app, layer: __esri.FeatureLayer }) {
+  private user: User
+  constructor(options: { app, layer: __esri.FeatureLayer, user: User }) {
     this.app = options.app;
     this.layer = options.layer;
+    this.user = options.user;
     this.pullRefresh();
   }
   private pullRefresh() {
@@ -13,7 +17,7 @@ class List {
     // Dummy Content
     $ptrContent.on('ptr:refresh', e => {
       this.layer.queryFeatures(<__esri.Query>{
-        where: "1=1", outFields: ["MaDanhBo", "ThoiGianNhap", "DiaChi"], orderByFields: ["ThoiGianNhap DESC"]
+        where: `NguoiNhap = '${this.user.Username}'`, outFields: ["MaDanhBo", "ThoiGianNhap", "DiaChi"], orderByFields: ["ThoiGianNhap DESC"]
       }).then(r => {
         r.features.forEach(f => {
           const attributes = f.attributes;

@@ -5,14 +5,19 @@ import MapView = require("esri/views/MapView");
 import MapEditor = require('./Map');
 import Graphic = require("esri/Graphic");
 import mapconfig = require('../config');
+import FeatureTable = require('../ditagis/FeatureTable');
+import User = require('../ditagis/User');
 class KhaoSatPage {
   private view: __esri.MapView;
   private app;
   private map: __esri.Map;
   private layer: __esri.FeatureLayer;
   private mapEditor: MapEditor;
-  constructor(options: { app }) {
+  private table: FeatureTable;
+  private user: User
+  constructor(options: { app, user: User }) {
     this.app = options.app;
+    this.user = options.user;
   }
   private initWidget() {
     this.view.ui.empty("top-left");
@@ -51,6 +56,7 @@ class KhaoSatPage {
         ],
       }
     });
+    this.table = new FeatureTable({ url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1", fieldID: "MaDanhBo" });
     this.map.add(this.layer);
     this.layer.then(_ => {
       let container = document.getElementById("form-container");
@@ -61,7 +67,7 @@ class KhaoSatPage {
           input = document.createElement("select");
           let option = document.createElement('option');
           option.innerText = "Chọn giá trị";
-          option.value = null;
+          option.value = -1+"";
           input.appendChild(option);
           (f.domain as __esri.CodedValueDomain).codedValues.forEach(function (domain) {
             let option = document.createElement('option');
@@ -74,9 +80,9 @@ class KhaoSatPage {
           if (f.name === "MaDanhBo") type = "number"
           input = document.createElement("input");
           input.setAttribute("type", type);
-          input.setAttribute("name", f.name);
           input.classList.add("fvalue");
         }
+        input.setAttribute("name", f.name);
         let li = document.createElement("li");
         li.innerHTML = `
           <div class="item-content item-input">
@@ -96,9 +102,6 @@ class KhaoSatPage {
   private registerEvent() {
     var route = () => {
       this.app.popup.open(".popup-map")
-      // this.app.views.main.router.navigate("/khao-sat/ban-do/", {
-      //   history: true
-      // })
     }
     this.view.on('click', (evt) => {
       route();
@@ -106,7 +109,7 @@ class KhaoSatPage {
     this.view.on('drag', (evt) => {
       route();
     })
-    $("#btnSubmit").click(this.applyEditFeatures.bind(this));
+    $("#btnSubmit").click(this.onSubmitClick.bind(this));
   }
   private initMapEditor() {
     this.mapEditor = new MapEditor({ map: this.map, app: this.app });
@@ -125,6 +128,15 @@ class KhaoSatPage {
       this.app.preloader.hide();
     })
   }
+  isValidDanhBo(id): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.table.findById(id).then(function (results) {
+        if (results.features.length > 0)
+          resolve(results.features[0]);
+        else resolve(null);
+      })
+    });
+  }
   private clearAttributes() {
     let clearData = {};
     this.layer.fields.forEach(function (f) {
@@ -133,11 +145,10 @@ class KhaoSatPage {
     this.app.form.fillFromData("#infoForm", clearData)
   }
 
-  private applyEditFeatures() {
-    this.app.preloader.show("Đang cập nhật...");
+  private onSubmitClick() {
     var attributes = {};
     var formAttr = this.app.form.convertToData('#infoForm');
-    if (!formAttr.MaDanhBo || (this.view.center.x < 0 || this.view.center.y < 0)) {
+    if ((this.view.center.x < 0 || this.view.center.y < 0)) {
       let message = 'Vui lòng điền đầy đủ các thông tin trên';
       this.app.toast.create({
         text: message,
@@ -150,7 +161,26 @@ class KhaoSatPage {
       attributes[f.name] = formAttr[f.name];
     })
     attributes['ThoiGianNhap'] = new Date().getTime();
-    attributes['NguoiNhap'] = "test";
+    attributes['NguoiNhap'] = this.user.Username;
+    if (attributes['MaDanhBo']) {
+      this.isValidDanhBo(attributes['MaDanhBo']).then(tblVal => {
+        const isValid = tblVal !== null;
+        if (isValid) {
+          this.applyEdit(attributes);
+          //thêm xong rồi thì xóa mã danh bộ
+          this.table.applyEdits({
+            deleteFeatures: [tblVal.attributes['OBJECTID']]
+          });
+        } else {
+          this.app.dialog.alert('Không tồn tại mã danh bộ', "Thông báo");
+        }
+      })
+    } else {
+      this.applyEdit(attributes);
+    }
+  }
+  private applyEdit(attributes) {
+    this.app.preloader.show("Đang cập nhật...");
     this.layer.applyEdits({
       addFeatures: [new Graphic({
         attributes: attributes, geometry: this.view.center
@@ -171,7 +201,6 @@ class KhaoSatPage {
         }).open();
       this.app.preloader.hide()();
     });
-
   }
 }
 export = KhaoSatPage;

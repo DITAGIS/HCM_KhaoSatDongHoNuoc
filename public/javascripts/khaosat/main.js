@@ -1,9 +1,10 @@
-define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "./Map", "esri/Graphic", "../config"], function (require, exports, Map, FeatureLayer, MapView, MapEditor, Graphic, mapconfig) {
+define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "./Map", "esri/Graphic", "../config", "../ditagis/FeatureTable"], function (require, exports, Map, FeatureLayer, MapView, MapEditor, Graphic, mapconfig, FeatureTable) {
     "use strict";
     var $ = Dom7;
     class KhaoSatPage {
         constructor(options) {
             this.app = options.app;
+            this.user = options.user;
         }
         initWidget() {
             this.view.ui.empty("top-left");
@@ -42,6 +43,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                     ],
                 }
             });
+            this.table = new FeatureTable({ url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1", fieldID: "MaDanhBo" });
             this.map.add(this.layer);
             this.layer.then(_ => {
                 let container = document.getElementById("form-container");
@@ -53,7 +55,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                         input = document.createElement("select");
                         let option = document.createElement('option');
                         option.innerText = "Chọn giá trị";
-                        option.value = null;
+                        option.value = -1 + "";
                         input.appendChild(option);
                         f.domain.codedValues.forEach(function (domain) {
                             let option = document.createElement('option');
@@ -68,9 +70,9 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                             type = "number";
                         input = document.createElement("input");
                         input.setAttribute("type", type);
-                        input.setAttribute("name", f.name);
                         input.classList.add("fvalue");
                     }
+                    input.setAttribute("name", f.name);
                     let li = document.createElement("li");
                     li.innerHTML = `
           <div class="item-content item-input">
@@ -97,7 +99,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             this.view.on('drag', (evt) => {
                 route();
             });
-            $("#btnSubmit").click(this.applyEditFeatures.bind(this));
+            $("#btnSubmit").click(this.onSubmitClick.bind(this));
         }
         initMapEditor() {
             this.mapEditor = new MapEditor({ map: this.map, app: this.app });
@@ -116,6 +118,16 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                 this.app.preloader.hide();
             });
         }
+        isValidDanhBo(id) {
+            return new Promise((resolve, reject) => {
+                this.table.findById(id).then(function (results) {
+                    if (results.features.length > 0)
+                        resolve(results.features[0]);
+                    else
+                        resolve(null);
+                });
+            });
+        }
         clearAttributes() {
             let clearData = {};
             this.layer.fields.forEach(function (f) {
@@ -123,11 +135,10 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             });
             this.app.form.fillFromData("#infoForm", clearData);
         }
-        applyEditFeatures() {
-            this.app.preloader.show("Đang cập nhật...");
+        onSubmitClick() {
             var attributes = {};
             var formAttr = this.app.form.convertToData('#infoForm');
-            if (!formAttr.MaDanhBo || (this.view.center.x < 0 || this.view.center.y < 0)) {
+            if ((this.view.center.x < 0 || this.view.center.y < 0)) {
                 let message = 'Vui lòng điền đầy đủ các thông tin trên';
                 this.app.toast.create({
                     text: message,
@@ -141,7 +152,27 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                 attributes[f.name] = formAttr[f.name];
             });
             attributes['ThoiGianNhap'] = new Date().getTime();
-            attributes['NguoiNhap'] = "test";
+            attributes['NguoiNhap'] = this.user.Username;
+            if (attributes['MaDanhBo']) {
+                this.isValidDanhBo(attributes['MaDanhBo']).then(tblVal => {
+                    const isValid = tblVal !== null;
+                    if (isValid) {
+                        this.applyEdit(attributes);
+                        this.table.applyEdits({
+                            deleteFeatures: [tblVal.attributes['OBJECTID']]
+                        });
+                    }
+                    else {
+                        this.app.dialog.alert('Không tồn tại mã danh bộ', "Thông báo");
+                    }
+                });
+            }
+            else {
+                this.applyEdit(attributes);
+            }
+        }
+        applyEdit(attributes) {
+            this.app.preloader.show("Đang cập nhật...");
             this.layer.applyEdits({
                 addFeatures: [new Graphic({
                         attributes: attributes, geometry: this.view.center

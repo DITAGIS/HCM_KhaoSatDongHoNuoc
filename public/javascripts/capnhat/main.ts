@@ -6,6 +6,8 @@ import Graphic = require("esri/Graphic");
 import Locate = require("esri/widgets/Locate");
 import mapconfig = require('../config');
 import ListTab = require('./List');
+import FeatureTable = require('../ditagis/FeatureTable');
+import User = require('../ditagis/User');
 
 import esriRequest = require("esri/request");
 class CapNhatPage {
@@ -14,12 +16,15 @@ class CapNhatPage {
   private map: __esri.Map;
   private layer: __esri.FeatureLayer;
   private centerPin: HTMLElement;
-  private listTab:ListTab;
-  constructor(options: { app }) {
+  private listTab: ListTab;
+  private table: FeatureTable;
+  private user: User
+  constructor(options: { app, user: User }) {
     this.app = options.app;
+    this.user = options.user;
   }
-  private initListTab(){
-    this.listTab = new ListTab({app:this.app,layer:this.layer});
+  private initListTab() {
+    this.listTab = new ListTab({ app: this.app, layer: this.layer, user: this.user });
   }
   private initWidget() {
     this.view.ui.empty("top-left");
@@ -62,9 +67,17 @@ class CapNhatPage {
       }
     });
     this.map.add(this.layer);
+    this.table = new FeatureTable({ url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1", fieldID: "MaDanhBo" });
   }
   private registerEvent() {
     this.view.popup.on("trigger-action", (e) => {
+      //nếu đối tượng đúng người cập nhật thì mới cho cập nhật
+      const attributes = this.view.popup.selectedFeature.attributes;
+      if (attributes['NguoiNhap'] !== this.user.Username) {
+        this.app.dialog.alert("Không có quyền truy cập", "Thông báo");
+        return;
+      }
+
       if (e.action.id === "cap-nhat-vi-tri") {
         this.updateGeometry();
       } else if (e.action.id === "cap-nhat-thuoc-tinh") {
@@ -132,9 +145,9 @@ class CapNhatPage {
           }
         }
         input.setAttribute("type", type);
-        input.setAttribute("name", f.name);
         input.classList.add("fvalue");
       }
+      input.setAttribute("name", f.name);
       let li = document.createElement("li");
       li.innerHTML = `
           <div class="item-content item-input">
@@ -150,27 +163,56 @@ class CapNhatPage {
     })
     //cập nhật giá trị
     this.app.form.fillFromData("form", attributes)
-    $("#btnSubmit").click(_ => {
-      let applyAttributes = this.app.form.convertToData("form");
-      applyAttributes.objectId = attributes.OBJECTID;
-      this.app.preloader.show("Đang cập nhật");
-      this.layer.applyEdits({
-        updateFeatures: [
-          new Graphic({
-            attributes: applyAttributes
-          })
-        ]
-      }).then(r => {
-        let message = r.updateFeatureResults[0].error ? 'Có lỗi xảy ra trong quá trình thực hiện, vui lòng thử lại.' : "Cập nhật thành công.";
-        if (message)
-          this.app.toast.create({
-            text: message,
-            closeTimeout: 3000,
-          }).open();
-        this.app.preloader.hide();
-        this.app.views.main.router.back();
-        this.view.popup.close();
+    $("#btnSubmit").click(this.onSubmitClick.bind(this))
+  }
+  isValidDanhBo(id): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.table.findById(id).then(function (results) {
+        if (results.features.length > 0)
+          resolve(results.features[0]);
+        else resolve(null);
       })
+    });
+  }
+  private onSubmitClick() {
+    const attributes = this.view.popup.selectedFeature.attributes;
+    let applyAttributes = this.app.form.convertToData("form");
+    applyAttributes.objectId = attributes.OBJECTID;
+    if (!attributes["MaDanhBo"] && applyAttributes['MaDanhBo']) {
+      this.isValidDanhBo(applyAttributes['MaDanhBo']).then(tblVal => {
+        const isValid = tblVal !== null;
+        if (isValid) {
+          this.applyEdit(applyAttributes);
+          //thêm xong rồi thì xóa mã danh bộ
+          this.table.applyEdits({
+            deleteFeatures: [tblVal.attributes['OBJECTID']]
+          });
+        } else {
+          this.app.dialog.alert('Không tồn tại mã danh bộ', "Thông báo");
+        }
+      })
+    } else {
+      this.applyEdit(applyAttributes);
+    }
+  }
+  private applyEdit(attributes) {
+    this.app.preloader.show("Đang cập nhật");
+    this.layer.applyEdits({
+      updateFeatures: [
+        new Graphic({
+          attributes: attributes
+        })
+      ]
+    }).then(r => {
+      let message = r.updateFeatureResults[0].error ? 'Có lỗi xảy ra trong quá trình thực hiện, vui lòng thử lại.' : "Cập nhật thành công.";
+      if (message)
+        this.app.toast.create({
+          text: message,
+          closeTimeout: 3000,
+        }).open();
+      this.app.preloader.hide();
+      this.app.views.main.router.back();
+      this.view.popup.close();
     })
   }
   private toggleCapNhatViTri() {

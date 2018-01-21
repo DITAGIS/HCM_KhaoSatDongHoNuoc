@@ -5,13 +5,14 @@ define(["require", "exports"], function (require, exports) {
         constructor(options) {
             this.app = options.app;
             this.layer = options.layer;
+            this.user = options.user;
             this.pullRefresh();
         }
         pullRefresh() {
             var $ptrContent = $('.ptr-content');
             $ptrContent.on('ptr:refresh', e => {
                 this.layer.queryFeatures({
-                    where: "1=1", outFields: ["MaDanhBo", "ThoiGianNhap", "DiaChi"], orderByFields: ["ThoiGianNhap DESC"]
+                    where: `NguoiNhap = '${this.user.Username}'`, outFields: ["MaDanhBo", "ThoiGianNhap", "DiaChi"], orderByFields: ["ThoiGianNhap DESC"]
                 }).then(r => {
                     r.features.forEach(f => {
                         const attributes = f.attributes;
