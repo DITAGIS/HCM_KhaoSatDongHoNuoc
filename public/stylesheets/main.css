@@ -15,3 +15,6 @@ i.esri-icon-map-pin.esri-component{
   height: 120px;
   width: 100%;
 }
+.list .item-date{
+  float: right
+}

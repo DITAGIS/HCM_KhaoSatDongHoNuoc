@@ -5,6 +5,7 @@ import MapView = require("esri/views/MapView");
 import Graphic = require("esri/Graphic");
 import Locate = require("esri/widgets/Locate");
 import mapconfig = require('../config');
+import ListTab = require('./List');
 
 import esriRequest = require("esri/request");
 class CapNhatPage {
@@ -13,8 +14,12 @@ class CapNhatPage {
   private map: __esri.Map;
   private layer: __esri.FeatureLayer;
   private centerPin: HTMLElement;
+  private listTab:ListTab;
   constructor(options: { app }) {
     this.app = options.app;
+  }
+  private initListTab(){
+    this.listTab = new ListTab({app:this.app,layer:this.layer});
   }
   private initWidget() {
     this.view.ui.empty("top-left");
@@ -198,6 +203,7 @@ class CapNhatPage {
     this.initWidget();
     this.initLayer();
     this.registerEvent();
+    this.initListTab();
     this.layer.then(_ => {
       this.app.preloader.hide();
     })

@@ -1,9 +1,12 @@
-define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "esri/widgets/Locate", "../config"], function (require, exports, Map, FeatureLayer, MapView, Graphic, Locate, mapconfig) {
+define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "esri/widgets/Locate", "../config", "./List"], function (require, exports, Map, FeatureLayer, MapView, Graphic, Locate, mapconfig, ListTab) {
     "use strict";
     var $ = Dom7;
     class CapNhatPage {
         constructor(options) {
             this.app = options.app;
+        }
+        initListTab() {
+            this.listTab = new ListTab({ app: this.app, layer: this.layer });
         }
         initWidget() {
             this.view.ui.empty("top-left");
@@ -187,6 +190,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             this.initWidget();
             this.initLayer();
             this.registerEvent();
+            this.initListTab();
             this.layer.then(_ => {
                 this.app.preloader.hide();
             });
