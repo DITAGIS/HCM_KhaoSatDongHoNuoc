@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/login.css">
+  </head>
+  <body>
+    <div id="login" class="center-vertical">
+      <form id="form-login" method="post" action="/login" class="well">
+        <h2>Đăng nhập!</h2>
+        <h6>Vui lòng đăng nhập để truy cập trang</h6>
+        <div class="form-group">
+          <label>Tài khoản</label>
+          <input type="text" id="user-tf" name="username" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Mật khẩu</label>
+          <input type="password" id="pass-tf" name="password" class="form-control">
+        </div>
+        <div class="controls">
+          <button type="button" id="remember" class="btn btn-default button-rememember-me"><span class="glyphicon glyphicon-unchecked button-rememember-me-glyph"></span>Nhớ mật khẩu</button>
+          <input type="hidden" name="remember" value="false">
+          <button type="submit" class="btn btn-primary button-sign-in"><span class="glyphicon glyphicon-lock"></span>Đăng nhập</button>
+        </div>
+        <div class="clearfix"></div>
+        <hr>
+        <div class="clearfix"></div>
+      </form>
+    </div>
+    <script src="javascripts/lib/jquery.min.js"></script>
+    <script src="/javascripts/lib/login.js"></script>
+  </body>
+</html>
