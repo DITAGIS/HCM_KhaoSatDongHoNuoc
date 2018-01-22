@@ -228,17 +228,19 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             }
         }
         deleteFeature() {
-            this.app.preloader.show();
-            this.layer.applyEdits({
-                deleteFeatures: [{ objectId: this.view.popup.selectedFeature.attributes.OBJECTID }]
-            }).then(r => {
-                let message = r.deleteFeatureResults[0].error ? 'Có lỗi xảy ra trong quá trình thực hiện, vui lòng thử lại.' : "Xóa thành công.";
-                this.app.toast.create({
-                    text: message,
-                    closeTimeout: 3000,
-                }).open();
-                this.app.preloader.hide();
-                this.view.popup.close();
+            this.app.dialog.confirm("Đối tượng sẽ bị xóa khỏi cơ sở dữ liệu", "Thông báo", _ => {
+                this.app.preloader.show();
+                this.layer.applyEdits({
+                    deleteFeatures: [{ objectId: this.view.popup.selectedFeature.attributes.OBJECTID }]
+                }).then(r => {
+                    let message = r.deleteFeatureResults[0].error ? 'Có lỗi xảy ra trong quá trình thực hiện, vui lòng thử lại.' : "Xóa thành công.";
+                    this.app.toast.create({
+                        text: message,
+                        closeTimeout: 3000,
+                    }).open();
+                    this.app.preloader.hide();
+                    this.view.popup.close();
+                });
             });
         }
         updateGeometry() {
