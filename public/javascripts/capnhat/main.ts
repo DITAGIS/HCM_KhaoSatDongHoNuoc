@@ -8,6 +8,7 @@ import mapconfig = require('../config');
 import ListTab = require('./List');
 import FeatureTable = require('../ditagis/FeatureTable');
 import User = require('../ditagis/User');
+import WebTileLayer = require("esri/layers/WebTileLayer");
 
 import esriRequest = require("esri/request");
 class CapNhatPage {
@@ -34,9 +35,13 @@ class CapNhatPage {
     this.view.ui.add(new Locate({ view: this.view }), "bottom-right")
   }
   private initMapView() {
-    this.map = new Map({
-      basemap: "osm"
-    });
+    this.map = new Map();
+    let worldImage = new WebTileLayer({
+      id: 'worldimagery',
+      urlTemplate: 'https://mt1.google.com/vt/lyrs=y&x={col}&y={row}&z={level}',
+      title: 'Ảnh vệ tinh',
+    })
+    this.map.add(worldImage);
     this.view = new MapView({
       container: "viewDiv", constraints: {
         rotationEnabled: false,

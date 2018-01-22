@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "./Map", "esri/Graphic", "../config", "../ditagis/FeatureTable"], function (require, exports, Map, FeatureLayer, MapView, MapEditor, Graphic, mapconfig, FeatureTable) {
+define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "./Map", "esri/Graphic", "../config", "../ditagis/FeatureTable", "esri/layers/WebTileLayer"], function (require, exports, Map, FeatureLayer, MapView, MapEditor, Graphic, mapconfig, FeatureTable, WebTileLayer) {
     "use strict";
     var $ = Dom7;
     class KhaoSatPage {
@@ -13,9 +13,13 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             this.view.ui.add(pin);
         }
         initMapView() {
-            this.map = new Map({
-                basemap: "osm"
+            this.map = new Map();
+            let worldImage = new WebTileLayer({
+                id: 'worldimagery',
+                urlTemplate: 'https://mt1.google.com/vt/lyrs=y&x={col}&y={row}&z={level}',
+                title: 'Ảnh vệ tinh',
             });
+            this.map.add(worldImage);
             this.view = new MapView({
                 container: "miniView", constraints: {
                     rotationEnabled: false,

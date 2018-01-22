@@ -7,6 +7,7 @@ import Graphic = require("esri/Graphic");
 import mapconfig = require('../config');
 import FeatureTable = require('../ditagis/FeatureTable');
 import User = require('../ditagis/User');
+import WebTileLayer = require("esri/layers/WebTileLayer");
 class KhaoSatPage {
   private view: __esri.MapView;
   private app;
@@ -26,9 +27,13 @@ class KhaoSatPage {
     this.view.ui.add(pin);
   }
   private initMapView() {
-    this.map = new Map({
-      basemap: "osm"
-    });
+    this.map = new Map();
+    let worldImage = new WebTileLayer({
+      id: 'worldimagery',
+      urlTemplate: 'https://mt1.google.com/vt/lyrs=y&x={col}&y={row}&z={level}',
+      title: 'Ảnh vệ tinh',
+    })
+    this.map.add(worldImage);
     this.view = new MapView({
       container: "miniView", constraints: {
         rotationEnabled: false,
@@ -67,7 +72,7 @@ class KhaoSatPage {
           input = document.createElement("select");
           let option = document.createElement('option');
           option.innerText = "Chọn giá trị";
-          option.value = -1+"";
+          option.value = -1 + "";
           input.appendChild(option);
           (f.domain as __esri.CodedValueDomain).codedValues.forEach(function (domain) {
             let option = document.createElement('option');
