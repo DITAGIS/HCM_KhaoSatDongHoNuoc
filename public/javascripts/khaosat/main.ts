@@ -55,8 +55,17 @@ class KhaoSatPage {
               fieldName: "DiaChi",
               label: "Địa chỉ",
             }, {
-              fieldName: "GhiChu", label: "Ghi chú"
-            }]
+              fieldName: "GhiChu", label: "Ghi chú", format: {
+                stringFieldOption: "text-area"
+              }
+            }, {
+              fieldName: "NguoiNhap", label: "Người cập nhật"
+            }, {
+              fieldName: "ThoiGianNhap", label: "Thời gian nhập", format: {
+                dateFormat: "short-date-short-time"
+              }
+            }
+            ]
           }
         ],
       }
