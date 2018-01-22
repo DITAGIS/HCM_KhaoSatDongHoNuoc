@@ -46,7 +46,8 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                         }
                     ],
                     actions: [{ id: "cap-nhat-vi-tri", title: "Cập nhật vị trí", className: "esri-icon-locate" },
-                        { id: "cap-nhat-thuoc-tinh", title: "Cập nhật thuộc tính", className: "esri-icon-edit" }]
+                        { id: "cap-nhat-thuoc-tinh", title: "Cập nhật thuộc tính", className: "esri-icon-edit" },
+                        { id: "xoa", title: "Xóa đối tượng", className: "esri-icon-erase" }]
                 }
             });
             this.map.add(this.layer);
@@ -65,14 +66,16 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                 else if (e.action.id === "cap-nhat-thuoc-tinh") {
                     this.updateAttributes();
                 }
+                else if (e.action.id === "xoa") {
+                    this.deleteFeature();
+                }
             });
             this.view.watch("center", function (oldVal, newVal) {
                 $(".long").text(newVal.longitude.toFixed(4) + "");
                 $(".lat").text(newVal.latitude.toFixed(4) + "");
             });
             $('#huy-cap-nhat-vi-tri').on('click', (evt) => {
-                $('#cap-nhat-vi-tri').addClass("hidden");
-                $('#huy-cap-nhat-vi-tri').addClass("hidden");
+                this.toggleCapNhatViTri();
             });
             $('#cap-nhat-vi-tri').on('click', (evt) => {
                 let objectId = this.view.popup.selectedFeature.attributes.OBJECTID;
@@ -108,7 +111,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                     input = document.createElement("select");
                     let option = document.createElement('option');
                     option.innerText = "Chọn giá trị";
-                    option.value = null;
+                    option.value = "-1";
                     input.appendChild(option);
                     f.domain.codedValues.forEach(function (domain) {
                         let option = document.createElement('option');
@@ -211,11 +214,25 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                 $('#huy-cap-nhat-vi-tri').addClass("hidden");
             }
         }
+        deleteFeature() {
+            this.app.preloader.show();
+            this.layer.applyEdits({
+                deleteFeatures: [{ objectId: this.view.popup.selectedFeature.attributes.OBJECTID }]
+            }).then(r => {
+                let message = r.deleteFeatureResults[0].error ? 'Có lỗi xảy ra trong quá trình thực hiện, vui lòng thử lại.' : "Xóa thành công.";
+                this.app.toast.create({
+                    text: message,
+                    closeTimeout: 3000,
+                }).open();
+                this.app.preloader.hide();
+                this.view.popup.close();
+            });
+        }
         updateGeometry() {
             this.toggleCapNhatViTri();
             this.app.toast.create({
                 text: 'Chọn vị trí và nhấn nút cập nhật',
-                closeTimeout: 3000,
+                closeTimeout: 2000,
             }).open();
             this.view.popup.close();
         }

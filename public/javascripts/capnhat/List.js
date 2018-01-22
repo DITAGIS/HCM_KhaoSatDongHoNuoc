@@ -11,6 +11,7 @@ define(["require", "exports"], function (require, exports) {
         pullRefresh() {
             var $ptrContent = $('.ptr-content');
             $ptrContent.on('ptr:refresh', e => {
+                $ptrContent.find('ul').empty();
                 this.layer.queryFeatures({
                     where: `NguoiNhap = '${this.user.Username}'`, outFields: ["MaDanhBo", "ThoiGianNhap", "DiaChi"], orderByFields: ["ThoiGianNhap DESC"]
                 }).then(r => {

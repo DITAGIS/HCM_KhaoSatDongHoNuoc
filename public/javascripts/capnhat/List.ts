@@ -16,6 +16,7 @@ class List {
     // Add 'refresh' listener on it
     // Dummy Content
     $ptrContent.on('ptr:refresh', e => {
+      $ptrContent.find('ul').empty();
       this.layer.queryFeatures(<__esri.Query>{
         where: `NguoiNhap = '${this.user.Username}'`, outFields: ["MaDanhBo", "ThoiGianNhap", "DiaChi"], orderByFields: ["ThoiGianNhap DESC"]
       }).then(r => {
