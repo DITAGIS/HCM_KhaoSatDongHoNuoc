@@ -5,7 +5,7 @@ i.esri-icon-map-pin.esri-component{
   left: 50%;
   top: calc(50% - 16px);
   transform: translate(-50%, -50%);
-  color: green;
+  color: #2196f3;
   font-size: xx-large;
 }
 .hidden{

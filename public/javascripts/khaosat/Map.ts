@@ -18,6 +18,9 @@ class MapEditor {
             map: options.map,
             zoom: mapconfig.zoom, // Sets the zoom level based on level of detail (LOD)
             center: mapconfig.center,
+            constraints: {
+                rotationEnabled: false,
+              },
             popup: {
                 dockEnabled: false, dockOptions: {
                     buttonEnabled: false
