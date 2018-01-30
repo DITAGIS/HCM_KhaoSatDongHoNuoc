@@ -9,9 +9,6 @@ define(["require", "exports", "esri/widgets/Locate", "esri/views/MapView", "../c
                 map: options.map,
                 zoom: mapconfig.zoom,
                 center: mapconfig.center,
-                constraints: {
-                    rotationEnabled: false,
-                },
                 popup: {
                     dockEnabled: false, dockOptions: {
                         buttonEnabled: false

@@ -9,7 +9,7 @@ import ListTab = require('./List');
 import FeatureTable = require('../ditagis/FeatureTable');
 import User = require('../ditagis/User');
 import WebTileLayer = require("esri/layers/WebTileLayer");
-
+import Search = require("esri/widgets/Search");
 import esriRequest = require("esri/request");
 class CapNhatPage {
   private view: __esri.MapView;
@@ -28,11 +28,26 @@ class CapNhatPage {
     this.listTab = new ListTab({ app: this.app, layer: this.layer, user: this.user });
   }
   private initWidget() {
-    this.view.ui.empty("top-left");
+    this.view.ui.move("zoom", "bottom-right");
     this.centerPin = document.createElement("i");
     this.centerPin.classList.add("esri-icon-map-pin", "hidden")
     this.view.ui.add(this.centerPin);
     this.view.ui.add(new Locate({ view: this.view }), "bottom-right")
+    var searchWidget = new Search({
+      view: this.view,
+      allPlaceholder: "Nhập nội dung tìm kiếm",
+      sources: [<__esri.FeatureLayerSource>{
+        featureLayer: this.layer,
+        searchFields: ["MADANHBO"],
+        displayField: "MADANHBO",
+        exactMatch: false,
+        outFields: ["*"],
+        name: "Đồng hồ nước",
+        placeholder: "Tìm kiếm mã danh bộ",
+      }]
+    });
+    // Add the search widget to the top left corner of the view
+    this.view.ui.add(searchWidget, "top-right");
   }
   private initMapView() {
     this.map = new Map();
@@ -43,9 +58,7 @@ class CapNhatPage {
     })
     this.map.add(worldImage);
     this.view = new MapView({
-      container: "viewDiv", constraints: {
-        rotationEnabled: false,
-      },
+      container: "viewDiv",
       map: this.map, zoom: mapconfig.zoom, center: mapconfig.center
     });
   }
@@ -276,8 +289,8 @@ class CapNhatPage {
   public run() {
     this.app.preloader.show();
     this.initMapView();
-    this.initWidget();
     this.initLayer();
+    this.initWidget();
     this.registerEvent();
     this.initListTab();
     this.layer.then(_ => {

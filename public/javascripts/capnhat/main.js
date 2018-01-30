@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "esri/widgets/Locate", "../config", "./List", "../ditagis/FeatureTable", "esri/layers/WebTileLayer"], function (require, exports, Map, FeatureLayer, MapView, Graphic, Locate, mapconfig, ListTab, FeatureTable, WebTileLayer) {
+define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "esri/widgets/Locate", "../config", "./List", "../ditagis/FeatureTable", "esri/layers/WebTileLayer", "esri/widgets/Search"], function (require, exports, Map, FeatureLayer, MapView, Graphic, Locate, mapconfig, ListTab, FeatureTable, WebTileLayer, Search) {
     "use strict";
     var $ = Dom7;
     class CapNhatPage {
@@ -10,11 +10,25 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             this.listTab = new ListTab({ app: this.app, layer: this.layer, user: this.user });
         }
         initWidget() {
-            this.view.ui.empty("top-left");
+            this.view.ui.move("zoom", "bottom-right");
             this.centerPin = document.createElement("i");
             this.centerPin.classList.add("esri-icon-map-pin", "hidden");
             this.view.ui.add(this.centerPin);
             this.view.ui.add(new Locate({ view: this.view }), "bottom-right");
+            var searchWidget = new Search({
+                view: this.view,
+                allPlaceholder: "Nhập nội dung tìm kiếm",
+                sources: [{
+                        featureLayer: this.layer,
+                        searchFields: ["MADANHBO"],
+                        displayField: "MADANHBO",
+                        exactMatch: false,
+                        outFields: ["*"],
+                        name: "Đồng hồ nước",
+                        placeholder: "Tìm kiếm mã danh bộ",
+                    }]
+            });
+            this.view.ui.add(searchWidget, "top-right");
         }
         initMapView() {
             this.map = new Map();
@@ -25,9 +39,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
             });
             this.map.add(worldImage);
             this.view = new MapView({
-                container: "viewDiv", constraints: {
-                    rotationEnabled: false,
-                },
+                container: "viewDiv",
                 map: this.map, zoom: mapconfig.zoom, center: mapconfig.center
             });
         }
@@ -257,8 +269,8 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
         run() {
             this.app.preloader.show();
             this.initMapView();
-            this.initWidget();
             this.initLayer();
+            this.initWidget();
             this.registerEvent();
             this.initListTab();
             this.layer.then(_ => {
