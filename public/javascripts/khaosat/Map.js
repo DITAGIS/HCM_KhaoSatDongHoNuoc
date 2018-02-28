@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/widgets/Locate", "esri/views/MapView", "../config"], function (require, exports, Locate, MapView, mapconfig) {
+define(["require", "exports", "esri/widgets/Locate", "esri/views/MapView", "esri/widgets/Search", "esri/layers/FeatureLayer", "../config"], function (require, exports, Locate, MapView, Search, FeatureLayer, mapconfig) {
     "use strict";
     var $ = Dom7;
     class MapEditor {
@@ -27,6 +27,32 @@ define(["require", "exports", "esri/widgets/Locate", "esri/views/MapView", "../c
             });
             this.view.ui.move("zoom", "bottom-right");
             this.view.ui.add(this.locateView, "bottom-right");
+            var searchWidget = new Search({
+                view: this.view,
+                allPlaceholder: "Nhập nội dung tìm kiếm",
+                sources: [{
+                        featureLayer: this.view.map.findLayerById(mapconfig.KSDongHoNuocLayer.id),
+                        searchFields: ["MADANHBO"],
+                        displayField: "MADANHBO",
+                        exactMatch: false,
+                        outFields: ["*"],
+                        resultGraphicEnabled: false,
+                        zoomScale: 1000,
+                        name: "Đồng hồ nước",
+                        placeholder: "Tìm kiếm mã danh bộ",
+                    }, {
+                        featureLayer: new FeatureLayer({ url: "https://ditagis.com:6443/arcgis/rest/services/HoChiMinh/KhaoSatDongHoNuoc_Nen/MapServer/0" }),
+                        searchFields: ["DBDongHoNuoc"],
+                        displayField: "DBDongHoNuoc",
+                        exactMatch: false,
+                        outFields: ["DBDongHoNuoc"],
+                        name: "Đồng hồ nước Q9",
+                        zoomScale: 1000,
+                        popupOpenOnSelect: false,
+                        placeholder: "Tìm kiếm mã danh bộ",
+                    }]
+            });
+            this.view.ui.add(searchWidget, "top-right");
         }
         registerEvent() {
             this.view.watch("center", function (oldVal, newVal) {

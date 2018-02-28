@@ -24,7 +24,19 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                         displayField: "MADANHBO",
                         exactMatch: false,
                         outFields: ["*"],
+                        resultGraphicEnabled: false,
+                        zoomScale: 1000,
                         name: "Đồng hồ nước",
+                        placeholder: "Tìm kiếm mã danh bộ",
+                    }, {
+                        featureLayer: new FeatureLayer({ url: "https://ditagis.com:6443/arcgis/rest/services/HoChiMinh/KhaoSatDongHoNuoc_Nen/MapServer/0" }),
+                        searchFields: ["DBDongHoNuoc"],
+                        displayField: "DBDongHoNuoc",
+                        exactMatch: false,
+                        outFields: ["DBDongHoNuoc"],
+                        name: "Đồng hồ nước Q9",
+                        zoomScale: 1000,
+                        popupOpenOnSelect: false,
                         placeholder: "Tìm kiếm mã danh bộ",
                     }]
             });

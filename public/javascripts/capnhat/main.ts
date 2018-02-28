@@ -46,7 +46,19 @@ class CapNhatPage {
         displayField: "MADANHBO",
         exactMatch: false,
         outFields: ["*"],
+        resultGraphicEnabled:false,
+        zoomScale:1000,
         name: "Đồng hồ nước",
+        placeholder: "Tìm kiếm mã danh bộ",
+      }, <__esri.FeatureLayerSource>{
+        featureLayer: new FeatureLayer({ url: "https://ditagis.com:6443/arcgis/rest/services/HoChiMinh/KhaoSatDongHoNuoc_Nen/MapServer/0" }),
+        searchFields: ["DBDongHoNuoc"],
+        displayField: "DBDongHoNuoc",
+        exactMatch: false,
+        outFields: ["DBDongHoNuoc"],
+        name: "Đồng hồ nước Q9",
+        zoomScale:1000,
+        popupOpenOnSelect:false,
         placeholder: "Tìm kiếm mã danh bộ",
       }]
     });
@@ -61,7 +73,7 @@ class CapNhatPage {
       title: 'Ảnh vệ tinh',
     })
     this.map.add(worldImage);
-    this.mapDHKHQ9 = new MapImageLayer({url:config.DongHoKhachHang_Quan9_TongHopLayer.url});
+    this.mapDHKHQ9 = new MapImageLayer({ url: config.DongHoKhachHang_Quan9_TongHopLayer.url });
     this.map.add(this.mapDHKHQ9)
     this.view = new MapView({
       container: "viewDiv",
@@ -101,7 +113,7 @@ class CapNhatPage {
       }
     });
     this.map.add(this.layer);
-    this.table = new FeatureTable({ url: config.BangMaDanhBo.url,fieldID: "MaDanhBo" });
+    this.table = new FeatureTable({ url: config.BangMaDanhBo.url, fieldID: "MaDanhBo" });
   }
   private registerEvent() {
     this.view.popup.on("trigger-action", (e) => {
