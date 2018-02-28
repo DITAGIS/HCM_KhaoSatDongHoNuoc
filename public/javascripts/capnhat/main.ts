@@ -11,11 +11,15 @@ import User = require('../ditagis/User');
 import WebTileLayer = require("esri/layers/WebTileLayer");
 import Search = require("esri/widgets/Search");
 import esriRequest = require("esri/request");
+import config = require('../config');
+import MapImageLayer = require("esri/layers/MapImageLayer");
+
 class CapNhatPage {
   private view: __esri.MapView;
   private app;
   private map: __esri.Map;
   private layer: __esri.FeatureLayer;
+  private mapDHKHQ9: __esri.MapImageLayer;
   private centerPin: HTMLElement;
   private listTab: ListTab;
   private table: FeatureTable;
@@ -57,6 +61,8 @@ class CapNhatPage {
       title: 'Ảnh vệ tinh',
     })
     this.map.add(worldImage);
+    this.mapDHKHQ9 = new MapImageLayer({url:config.DongHoKhachHang_Quan9_TongHopLayer.url});
+    this.map.add(this.mapDHKHQ9)
     this.view = new MapView({
       container: "viewDiv",
       map: this.map, zoom: mapconfig.zoom, center: mapconfig.center
@@ -95,7 +101,7 @@ class CapNhatPage {
       }
     });
     this.map.add(this.layer);
-    this.table = new FeatureTable({ url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1", fieldID: "MaDanhBo" });
+    this.table = new FeatureTable({ url: config.BangMaDanhBo.url,fieldID: "MaDanhBo" });
   }
   private registerEvent() {
     this.view.popup.on("trigger-action", (e) => {

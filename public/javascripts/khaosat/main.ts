@@ -8,11 +8,14 @@ import mapconfig = require('../config');
 import FeatureTable = require('../ditagis/FeatureTable');
 import User = require('../ditagis/User');
 import WebTileLayer = require("esri/layers/WebTileLayer");
+import MapImageLayer = require("esri/layers/MapImageLayer");
+import config = require('../config');
 class KhaoSatPage {
   private view: __esri.MapView;
   private app;
   private map: __esri.Map;
   private layer: __esri.FeatureLayer;
+  private mapDHKHQ9: __esri.MapImageLayer;
   private mapEditor: MapEditor;
   private table: FeatureTable;
   private user: User
@@ -34,6 +37,8 @@ class KhaoSatPage {
       title: 'Ảnh vệ tinh',
     })
     this.map.add(worldImage);
+    this.mapDHKHQ9 = new MapImageLayer({url:config.DongHoKhachHang_Quan9_TongHopLayer.url});
+    this.map.add(this.mapDHKHQ9)
     this.view = new MapView({
       container: "miniView", constraints: {
         rotationEnabled: false,
@@ -70,7 +75,7 @@ class KhaoSatPage {
         ],
       }
     });
-    this.table = new FeatureTable({ url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1", fieldID: "MaDanhBo" });
+    this.table = new FeatureTable({ url: config.BangMaDanhBo.url, fieldID: "MaDanhBo" });
     this.map.add(this.layer);
     this.layer.then(_ => {
       let container = document.getElementById("form-container");

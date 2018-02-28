@@ -34,7 +34,7 @@ export =  {
   BangMaDanhBo: {
     title: 'Bảng Mã Danh Bộ',
     id: 'BangMaDanhBo',
-    url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1',
+    url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/2',
     outFields: ['*']
   }
   ,
@@ -42,6 +42,14 @@ export =  {
     title: 'Khảo sát đồng hồ nước',
     id: "KSDongHoNuoc",
     url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/0",
+    outFields: ['*'],
+    permission: {
+      view: true, create: true, delete: true, edit: true
+    }
+  },
+  DongHoKhachHang_Quan9_TongHopLayer: {
+    id: "DongHoKhachHang_Quan9_TongHopLayer",
+    url: "https://ditagis.com:6443/arcgis/rest/services/HoChiMinh/KhaoSatDongHoNuoc_Nen/MapServer",
     outFields: ['*'],
     permission: {
       view: true, create: true, delete: true, edit: true

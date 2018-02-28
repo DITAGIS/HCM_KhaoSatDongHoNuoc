@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "./Map", "esri/Graphic", "../config", "../ditagis/FeatureTable", "esri/layers/WebTileLayer"], function (require, exports, Map, FeatureLayer, MapView, MapEditor, Graphic, mapconfig, FeatureTable, WebTileLayer) {
+define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "./Map", "esri/Graphic", "../config", "../ditagis/FeatureTable", "esri/layers/WebTileLayer", "esri/layers/MapImageLayer", "../config"], function (require, exports, Map, FeatureLayer, MapView, MapEditor, Graphic, mapconfig, FeatureTable, WebTileLayer, MapImageLayer, config) {
     "use strict";
     var $ = Dom7;
     class KhaoSatPage {
@@ -20,6 +20,8 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                 title: 'Ảnh vệ tinh',
             });
             this.map.add(worldImage);
+            this.mapDHKHQ9 = new MapImageLayer({ url: config.DongHoKhachHang_Quan9_TongHopLayer.url });
+            this.map.add(this.mapDHKHQ9);
             this.view = new MapView({
                 container: "miniView", constraints: {
                     rotationEnabled: false,
@@ -56,7 +58,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                     ],
                 }
             });
-            this.table = new FeatureTable({ url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1", fieldID: "MaDanhBo" });
+            this.table = new FeatureTable({ url: config.BangMaDanhBo.url, fieldID: "MaDanhBo" });
             this.map.add(this.layer);
             this.layer.then(_ => {
                 let container = document.getElementById("form-container");

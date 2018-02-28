@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "esri/widgets/Locate", "../config", "./List", "../ditagis/FeatureTable", "esri/layers/WebTileLayer", "esri/widgets/Search"], function (require, exports, Map, FeatureLayer, MapView, Graphic, Locate, mapconfig, ListTab, FeatureTable, WebTileLayer, Search) {
+define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/views/MapView", "esri/Graphic", "esri/widgets/Locate", "../config", "./List", "../ditagis/FeatureTable", "esri/layers/WebTileLayer", "esri/widgets/Search", "../config", "esri/layers/MapImageLayer"], function (require, exports, Map, FeatureLayer, MapView, Graphic, Locate, mapconfig, ListTab, FeatureTable, WebTileLayer, Search, config, MapImageLayer) {
     "use strict";
     var $ = Dom7;
     class CapNhatPage {
@@ -38,6 +38,8 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                 title: 'Ảnh vệ tinh',
             });
             this.map.add(worldImage);
+            this.mapDHKHQ9 = new MapImageLayer({ url: config.DongHoKhachHang_Quan9_TongHopLayer.url });
+            this.map.add(this.mapDHKHQ9);
             this.view = new MapView({
                 container: "viewDiv",
                 map: this.map, zoom: mapconfig.zoom, center: mapconfig.center
@@ -76,7 +78,7 @@ define(["require", "exports", "esri/Map", "esri/layers/FeatureLayer", "esri/view
                 }
             });
             this.map.add(this.layer);
-            this.table = new FeatureTable({ url: "https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1", fieldID: "MaDanhBo" });
+            this.table = new FeatureTable({ url: config.BangMaDanhBo.url, fieldID: "MaDanhBo" });
         }
         registerEvent() {
             this.view.popup.on("trigger-action", (e) => {
