@@ -34,7 +34,7 @@ export =  {
   BangMaDanhBo: {
     title: 'Bảng Mã Danh Bộ',
     id: 'BangMaDanhBo',
-    url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/2',
+    url: 'https://ditagis.com:6443/arcgis/rest/services/BinhDuong/KhaoSatDongHoNuoc/FeatureServer/1',
     outFields: ['*']
   }
   ,
